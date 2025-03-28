@@ -1,24 +1,14 @@
+// SDL
 #include <SDL.h>
 
-#if _DEBUG
-// ReSharper disable once CppUnusedIncludeDirective
-#if __has_include(<vld.h>)
-#include <vld.h>
-#endif
-#endif
-
+// ENGINE
 #include "Kobengine.h"
 #include "SceneManager.h"
 #include "ResourceManager.h"
 #include "Scene.h"
-
-#include <filesystem>
-namespace fs = std::filesystem;
-
-// Managers
 #include "InputManager.h"
 
-// Components
+// COMPONENTS
 #include "IntUIComponent.h"
 #include "FPSComponent.h"
 #include "ImageRendererComponent.h"
@@ -26,15 +16,12 @@ namespace fs = std::filesystem;
 #include "HealthComponent.h"
 #include "ScoreComponent.h"
 
-// Commands
+// COMMANDS
 #include "MoveCommands.h"
 #include "DamageCommand.h"
 #include "ScoreCommand.h"
 
-// Events
-#include "Event.h"
-
-void load()
+void kob::Kobengine::Setup()
 {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~    Setup
@@ -160,16 +147,4 @@ void load()
 	inputManager.RegisterKeyboardCmd(SDLK_c, TriggerState::Pressed, std::make_unique<DamageCommand>(*beanHealth));
 	inputManager.RegisterKeyboardCmd(SDLK_z, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 10));
 	inputManager.RegisterKeyboardCmd(SDLK_x, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 100));
-
-}
-
-int main(int, char*[])
-{
-	fs::path data_location = "./Resources/";
-	if(!fs::exists(data_location))
-		data_location = "../Resources/";
-
-	kob::Kobengine engine(data_location);
-	engine.Run(load);
-    return 0;
 }

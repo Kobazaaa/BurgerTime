@@ -14,7 +14,7 @@ set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/game)
 # Set source files for the game
 list(APPEND BURGER_TIME_SOURCES
     # Main
-	"${SOURCE_DIR}/main.cpp"
+	"${SOURCE_DIR}/BurgerTime.cpp"
 
     # Components
     "${SOURCE_DIR}/Components/HealthComponent.cpp"      "${SOURCE_DIR}/Components/HealthComponent.h"
