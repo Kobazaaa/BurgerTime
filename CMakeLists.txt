@@ -12,13 +12,27 @@ set(TARGET_NAME BurgerTime)
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/game)
 
 # Set source files for the game
-set(BURGER_TIME_SOURCES
-	"${SOURCE_DIR}/BurgerTimeEntry.cpp"
+list(APPEND BURGER_TIME_SOURCES
+    # Main
+	"${SOURCE_DIR}/main.cpp"
+
+    # Components
+    "${SOURCE_DIR}/Components/HealthComponent.cpp"      "${SOURCE_DIR}/Components/HealthComponent.h"
+    "${SOURCE_DIR}/Components/RotateComponent.cpp"      "${SOURCE_DIR}/Components/RotateComponent.h"
+    "${SOURCE_DIR}/Components/ScoreComponent.cpp"       "${SOURCE_DIR}/Components/ScoreComponent.h"
+
+    # Commands
+    "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"     "${SOURCE_DIR}/InputCommands/DamageCommand.h"
+    "${SOURCE_DIR}/InputCommands/MoveCommands.cpp"      "${SOURCE_DIR}/InputCommands/MoveCommands.h"
+    "${SOURCE_DIR}/InputCommands/ScoreCommand.cpp"      "${SOURCE_DIR}/InputCommands/ScoreCommand.h"
 )
 
 # Create the executable
 add_executable(${TARGET_NAME} ${BURGER_TIME_SOURCES})
-target_include_directories(${TARGET_NAME} PUBLIC ${SOURCE_DIR})
+target_include_directories(${TARGET_NAME} PUBLIC
+    "${SOURCE_DIR}/Components"
+    "${SOURCE_DIR}/InputCommands"
+)
 
 # Enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
