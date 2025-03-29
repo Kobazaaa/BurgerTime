@@ -75,8 +75,6 @@ void kob::Kobengine::Setup()
 	bean.SetLocalScale(glm::vec3(3, 3, 1));
 	bean.SetLocalRotation(glm::vec3(0, 0, 180));
 
-	chef.SetParent(&bean, true);
-
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~    UI Setup
