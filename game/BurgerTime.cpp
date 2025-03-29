@@ -63,6 +63,8 @@ void kob::Kobengine::Setup()
 	const auto chefHealth = chef.AddComponent<HealthComponent>(3);
 	const auto chefScore = chef.AddComponent<ScoreComponent>();
 	chef.SetLocalPosition(glm::vec3(50, 250, 0));
+	chef.SetLocalScale(glm::vec3(1, 1, 1));
+	chef.SetLocalRotation(glm::vec3(0, 0, 37));
 
 	// Bean
 	auto& bean = scene.AddEmpty();
@@ -70,6 +72,10 @@ void kob::Kobengine::Setup()
 	const auto beanHealth = bean.AddComponent<HealthComponent>(3);
 	const auto beanScore = bean.AddComponent<ScoreComponent>();
 	bean.SetLocalPosition(glm::vec3(50, 300, 0));
+	bean.SetLocalScale(glm::vec3(3, 3, 1));
+	bean.SetLocalRotation(glm::vec3(0, 0, 180));
+
+	chef.SetParent(&bean, true);
 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
