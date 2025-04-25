@@ -3,6 +3,7 @@
 
 // ENGINE
 #include "Kobengine.h"
+#include "ServiceLocator.h"
 #include "SceneManager.h"
 #include "ResourceManager.h"
 #include "Scene.h"
@@ -17,19 +18,59 @@
 #include "ScoreComponent.h"
 
 // COMMANDS
+#include "Animator.h"
 #include "MoveCommands.h"
 #include "DamageCommand.h"
 #include "ScoreCommand.h"
+#include "SpriteSheet.h"
 
 void kob::Kobengine::Setup()
 {
+	SetWindowSize(624, 600);
+	SetWindowTitle("Burger Time - Kobe Dereyne - 2GD10");
+	ServiceLocator<ISoundSystem>::GetService().Play("Game Start.wav", 0.25f, 0);
+
+	constexpr float chefWalkDelay = 0.1f;
+	constexpr int chefTxtSize = 16;
+	auto chefSheet = ResourceManager::GetInstance().LoadSpriteSheet("ChefSheet.png",
+		{
+			{"Down", {
+				{
+					{ 0, 16, chefTxtSize, chefTxtSize},
+					{16, 16, chefTxtSize, chefTxtSize},
+					{32, 16, chefTxtSize, chefTxtSize},
+					{16, 16, chefTxtSize, chefTxtSize},
+				}, chefWalkDelay} },
+			{"Up", {
+				{
+					{ 96, 16, chefTxtSize, chefTxtSize},
+					{112, 16, chefTxtSize, chefTxtSize},
+					{128, 16, chefTxtSize, chefTxtSize},
+					{112, 16, chefTxtSize, chefTxtSize},
+				}, chefWalkDelay} },
+			{"Left", {
+				{
+					{48, 16, chefTxtSize, chefTxtSize},
+					{64, 16, chefTxtSize, chefTxtSize},
+					{80, 16, chefTxtSize, chefTxtSize},
+					{64, 16, chefTxtSize, chefTxtSize},
+				}, chefWalkDelay} },
+			{"Right", {
+				{
+					{48, 0, chefTxtSize, chefTxtSize},
+					{64, 0, chefTxtSize, chefTxtSize},
+					{80, 0, chefTxtSize, chefTxtSize},
+					{64, 0, chefTxtSize, chefTxtSize},
+				}, chefWalkDelay} }
+		});
+
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~    Setup
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	using namespace kob;
 	auto& scene = SceneManager::GetInstance().CreateScene("Demo");
-	auto fontL = ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
-	auto fontS = ResourceManager::GetInstance().LoadFont("Lingua.otf", 16);
+	//auto fontL = ResourceManager::GetInstance().LoadFont("arcade-legacy.otf", 18);
+	auto fontS = ResourceManager::GetInstance().LoadFont("arcade-legacy.otf", 8);
 	auto& inputManager = InputManager::GetInstance();
 	constexpr float speed = 50.f;
 
@@ -37,20 +78,9 @@ void kob::Kobengine::Setup()
 	// ~~    Background Setup
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	auto bg = std::make_unique<GameObject>();
-	bg->AddComponent<ImageRendererComponent>("background.tga");
+	bg->AddComponent<ImageRendererComponent>("Levels.png");
+	bg->SetLocalScale({ 3, 3, 3 });
 	scene.Add(std::move(bg));
-	
-	auto logo = std::make_unique<GameObject>();
-	logo->AddComponent<ImageRendererComponent>("logo.tga");
-	logo->SetLocalPosition(glm::vec3(216, 180, 0));
-	scene.Add(std::move(logo));
-
-	auto title = std::make_unique<GameObject>();
-	title->AddComponent<TextRendererComponent>("Programming 4 Assignment", fontL);
-	title->SetLocalPosition(glm::vec3(80, 20, 0));
-	scene.Add(std::move(title));
-
-
 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,17 +89,20 @@ void kob::Kobengine::Setup()
 
 	// Chef
 	auto& chef = scene.AddEmpty();
-	chef.AddComponent<ImageRendererComponent>("Chef.png");
-	const auto chefHealth = chef.AddComponent<HealthComponent>(3);
+	const auto chefHealth = chef.AddComponent<HealthComponent>(4);
 	const auto chefScore = chef.AddComponent<ScoreComponent>();
-	chef.SetLocalPosition(glm::vec3(50, 250, 0));
-	chef.SetLocalScale(glm::vec3(1, 1, 1));
-	chef.SetLocalRotation(glm::vec3(0, 0, 37));
+	const auto renderComp = chef.AddComponent<ImageRendererComponent>(chefSheet->GetTexture());
+	const auto animator = chef.AddComponent<Animator>(renderComp, chefSheet);
+	chef.SetLocalPosition(glm::vec3(289, 420, 0));
+	chef.SetLocalScale(glm::vec3(3, 3, 3));
+
+	animator->Play("Down", true);
 
 	// Bean
 	auto& bean = scene.AddEmpty();
 	bean.AddComponent<ImageRendererComponent>("Bean.png");
 	const auto beanHealth = bean.AddComponent<HealthComponent>(3);
+	//beanHealth->OnDeath() += ;
 	const auto beanScore = bean.AddComponent<ScoreComponent>();
 	bean.SetLocalPosition(glm::vec3(50, 300, 0));
 	bean.SetLocalScale(glm::vec3(3, 3, 1));
@@ -83,21 +116,14 @@ void kob::Kobengine::Setup()
 	// Chef
 	auto chefInputUI = std::make_unique<GameObject>();
 	chefInputUI->AddComponent<TextRendererComponent>("Use the D-Pad to move the Chef, X to inflict damage, A and B to gain score", fontS);
-	chefInputUI->SetLocalPosition(glm::vec3(5, 100, 0));
+	chefInputUI->SetLocalPosition(glm::vec3(5, 500, 0));
 	scene.Add(std::move(chefInputUI));
 
 	// Bean
 	auto beanInputUI = std::make_unique<GameObject>();
 	beanInputUI->AddComponent<TextRendererComponent>("Use WASD to move the Bean, C to inflict damage, Z and X to gain score", fontS);
-	beanInputUI->SetLocalPosition(glm::vec3(5, 120, 0));
+	beanInputUI->SetLocalPosition(glm::vec3(5, 520, 0));
 	scene.Add(std::move(beanInputUI));
-
-	// Fps
-	auto fpsUI = std::make_unique<GameObject>();
-	fpsUI->AddComponent<TextRendererComponent>("FPS", fontL);
-	fpsUI->SetLocalPosition(glm::vec3(0, 450, 0));
-	fpsUI->AddComponent<FPSComponent>();
-	scene.Add(std::move(fpsUI));
 
 	// Health
 	auto chefHealthUI = std::make_unique<GameObject>();
@@ -133,22 +159,22 @@ void kob::Kobengine::Setup()
 	inputManager.RegisterGamepad();
 
 	// Chef
-	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_UP,	 TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 0, -1, 0 }, 2 * speed), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_DOWN,  TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 0,  1, 0 }, 2 * speed), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_RIGHT, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 1,  0, 0 }, 2 * speed), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_LEFT,  TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ -1,  0, 0 }, 2 * speed), 0);
+	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_UP,	 TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 0, -1, 0 }, 2 * speed), 0);
+	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_DOWN,  TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 0,  1, 0 }, 2 * speed), 0);
+	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_RIGHT, TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 1,  0, 0 }, 2 * speed), 0);
+	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_LEFT,  TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ -1,  0, 0 }, 2 * speed), 0);
 
-	inputManager.RegisterGamepadCmd(Gamepad::Button::X, TriggerState::Pressed, std::make_unique<DamageCommand>(*chefHealth), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::A, TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 10), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::B, TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 100), 0);
+	inputManager.RegisterGamepadCmd(Gamepad::Button::X, TriggerState::Pressed, std::make_unique<DamageCommand>(*beanHealth), 0);
+	inputManager.RegisterGamepadCmd(Gamepad::Button::A, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 10), 0);
+	inputManager.RegisterGamepadCmd(Gamepad::Button::B, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 100), 0);
 
 	// Bean
-	inputManager.RegisterKeyboardCmd(SDLK_w, TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 0, -1, 0 }, speed));
-	inputManager.RegisterKeyboardCmd(SDLK_s, TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 0,  1, 0 }, speed));
-	inputManager.RegisterKeyboardCmd(SDLK_d, TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 1,  0, 0 }, speed));
-	inputManager.RegisterKeyboardCmd(SDLK_a, TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{-1,  0, 0 }, speed));
+	inputManager.RegisterKeyboardCmd(SDLK_w, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 0, -1, 0 }, speed));
+	inputManager.RegisterKeyboardCmd(SDLK_s, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 0,  1, 0 }, speed));
+	inputManager.RegisterKeyboardCmd(SDLK_d, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 1,  0, 0 }, speed));
+	inputManager.RegisterKeyboardCmd(SDLK_a, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{-1,  0, 0 }, speed));
 
-	inputManager.RegisterKeyboardCmd(SDLK_c, TriggerState::Pressed, std::make_unique<DamageCommand>(*beanHealth));
-	inputManager.RegisterKeyboardCmd(SDLK_z, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 10));
-	inputManager.RegisterKeyboardCmd(SDLK_x, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 100));
+	inputManager.RegisterKeyboardCmd(SDLK_c, TriggerState::Pressed, std::make_unique<DamageCommand>(*chefHealth));
+	inputManager.RegisterKeyboardCmd(SDLK_z, TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 10));
+	inputManager.RegisterKeyboardCmd(SDLK_x, TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 100));
 }

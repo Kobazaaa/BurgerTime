@@ -5,6 +5,7 @@
 
 namespace kob
 {
+	class Animator;
 	class MoveCommand final : public Command
 	{
 	public:
@@ -12,6 +13,7 @@ namespace kob
 		void Execute() override;
 	private:
 		GameObject* m_pGameObject;
+		Animator* m_pAnimator;
 		glm::vec3 m_Direction;
 		float m_Speed;
 	};
