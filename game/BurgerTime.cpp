@@ -90,6 +90,7 @@ void kob::Kobengine::Setup()
 	// Chef
 	auto& chef = scene.AddEmpty();
 	const auto chefHealth = chef.AddComponent<HealthComponent>(4);
+	chefHealth->OnDamageTaken() += [] {	ServiceLocator<ISoundSystem>::GetService().Play("Death.wav", 0.25f, 0); };
 	const auto chefScore = chef.AddComponent<ScoreComponent>();
 	const auto renderComp = chef.AddComponent<ImageRendererComponent>(chefSheet->GetTexture());
 	const auto animator = chef.AddComponent<Animator>(renderComp, chefSheet);
@@ -102,7 +103,7 @@ void kob::Kobengine::Setup()
 	auto& bean = scene.AddEmpty();
 	bean.AddComponent<ImageRendererComponent>("Bean.png");
 	const auto beanHealth = bean.AddComponent<HealthComponent>(3);
-	//beanHealth->OnDeath() += ;
+	beanHealth->OnDamageTaken() += [] {	ServiceLocator<ISoundSystem>::GetService().Play("Death.wav", 0.25f, 0); };
 	const auto beanScore = bean.AddComponent<ScoreComponent>();
 	bean.SetLocalPosition(glm::vec3(50, 300, 0));
 	bean.SetLocalScale(glm::vec3(3, 3, 1));
@@ -124,6 +125,11 @@ void kob::Kobengine::Setup()
 	beanInputUI->AddComponent<TextRendererComponent>("Use WASD to move the Bean, C to inflict damage, Z and X to gain score", fontS);
 	beanInputUI->SetLocalPosition(glm::vec3(5, 520, 0));
 	scene.Add(std::move(beanInputUI));
+
+	auto info = std::make_unique<GameObject>();
+	info->AddComponent<TextRendererComponent>("Inflicting damage makes sound!!!", fontS);
+	info->SetLocalPosition(glm::vec3(5, 540, 0));
+	scene.Add(std::move(info));
 
 	// Health
 	auto chefHealthUI = std::make_unique<GameObject>();

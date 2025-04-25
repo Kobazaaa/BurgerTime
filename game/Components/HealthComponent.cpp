@@ -35,7 +35,10 @@ void kob::HealthComponent::Damage(int amount)
 	m_CurrentLives -= amount;
 	m_CurrentLives = std::clamp(m_CurrentLives, 0, m_MaxLives);
 	if (oldLives != m_CurrentLives)
+	{
 		m_OnHealthChanged(m_CurrentLives);
+		m_OnDamageTaken();
+	}
 
 	if (m_CurrentLives <= 0)
 	{
@@ -74,6 +77,12 @@ kob::Event<int>& kob::HealthComponent::OnHealthChanged()
 {
 	return m_OnHealthChanged;
 }
+
+kob::Event<>& kob::HealthComponent::OnDamageTaken()
+{
+	return m_OnDamageTaken;
+}
+
 kob::Event<>& kob::HealthComponent::OnDeath()
 {
 	return m_OnDeath;

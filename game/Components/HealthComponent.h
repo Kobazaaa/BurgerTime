@@ -36,6 +36,7 @@ namespace kob
 		//    Events
 		//--------------------------------------------------
 		Event<int>& OnHealthChanged();
+		Event<>& OnDamageTaken();
 		Event<>& OnDeath();
 
 	private:
@@ -45,6 +46,7 @@ namespace kob
 
 		// Events
 		Event<int> m_OnHealthChanged;
+		Event<> m_OnDamageTaken;
 		Event<> m_OnDeath;
 	};
 }
