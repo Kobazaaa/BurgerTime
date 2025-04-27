@@ -19,6 +19,8 @@ void kob::MoveCommand::Execute()
 	const auto newPos = currPos + m_Direction * m_Speed * Timer::GetDeltaSeconds();
 	m_pGameObject->SetLocalPosition(newPos);
 
+	if (!m_pAnimator)
+		return;
 	if (m_Direction.y < 0)
 		m_pAnimator->Play("Up", true);
 	if (m_Direction.y > 0)
