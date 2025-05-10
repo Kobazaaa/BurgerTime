@@ -27,14 +27,15 @@
 #include "LevelLoader.h"
 #include <iostream>
 
+#include "LevelComponent.h"
+
 void kob::Kobengine::Setup()
 {
-	uint32_t rows;
-	uint32_t cols;
-	auto tiles = BT::LevelLoader::LoadCSV("./assets/level/Level01.csv", rows, cols);
+	constexpr uint32_t ROWS = 13;
+	constexpr uint32_t COLS = 17;
 
-	const float windowWidth  = cols * 32.f;
-	const float windowHeight = rows * 32.f;
+	const float windowWidth  = COLS * 32.f;
+	const float windowHeight = ROWS * 32.f;
 	SetWindowSize(static_cast<int>(windowWidth), static_cast<int>(windowHeight));
 	SetWindowTitle("Burger Time - Kobe Dereyne - 2GD10");
 	ServiceLocator<ISoundSystem>::GetService().Play("sound/BGM.wav", 0.25f, -1);
@@ -78,8 +79,11 @@ void kob::Kobengine::Setup()
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	using namespace kob;
 	using namespace bt;
-	auto& scene = SceneManager::GetInstance().CreateScene("Demo");
-	BT::LevelLoader::SpawnTileMap(tiles, rows, cols, scene, 32.f);
+	auto& scene = SceneManager::GetInstance().CreateScene("GameScene");
+
+	auto& level01 = scene.AddEmpty();
+	auto levelcomp = level01.AddComponent<LevelComponent>("./assets/level/Level01.csv");
+	levelcomp->Build();
 
 	//auto fontL = ResourceManager::GetInstance().LoadFont("arcade-legacy.otf", 18);
 	auto fontS = ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 8);
@@ -108,7 +112,8 @@ void kob::Kobengine::Setup()
 	const auto animator = chef.AddComponent<Animator>(renderComp, chefSheet);
 	const auto chefMovement = chef.AddComponent<MovementComponent>(speed);
 	animator->Play("Down", false);
-	chef.SetLocalPosition(glm::vec3(289, 420, 0));
+	auto chefSpawn = levelcomp->GetChefSpawn();
+	chef.SetLocalPosition({ chefSpawn.x, chefSpawn.y, 0 });
 	chef.SetLocalScale(glm::vec3(2,2,2));
 
 	// Bean
@@ -171,7 +176,7 @@ void kob::Kobengine::Setup()
 	scene.Add(std::move(beanScoreUI));
 
 	auto& debugGrid = scene.AddEmpty();
-	debugGrid.AddComponent<GridRendererComponent>(glm::vec2{ windowWidth, windowHeight }, rows, cols);
+	debugGrid.AddComponent<GridRendererComponent>(glm::vec2{ windowWidth, windowHeight }, ROWS, COLS);
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~    Input Setup

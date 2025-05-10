@@ -21,6 +21,7 @@ list(APPEND BURGER_TIME_SOURCES
     "${SOURCE_DIR}/Components/RotateComponent.cpp"      "${SOURCE_DIR}/Components/RotateComponent.h"
     "${SOURCE_DIR}/Components/ScoreComponent.cpp"       "${SOURCE_DIR}/Components/ScoreComponent.h"
     "${SOURCE_DIR}/Components/MovementComponent.cpp"    "${SOURCE_DIR}/Components/MovementComponent.h"
+    "${SOURCE_DIR}/Components/LevelComponent.cpp"       "${SOURCE_DIR}/Components/LevelComponent.h"
 
     # Commands
     "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"     "${SOURCE_DIR}/InputCommands/DamageCommand.h"

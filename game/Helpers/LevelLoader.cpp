@@ -10,8 +10,8 @@
 //--------------------------------------------------
 //    Loaders
 //--------------------------------------------------
-std::vector<BT::LevelLoader::TileType>
-	BT::LevelLoader::LoadCSV(const std::filesystem::path& file, uint32_t& outRows, uint32_t& outCols)
+std::vector<bt::LevelLoader::TileType>
+	bt::LevelLoader::LoadCSV(const std::filesystem::path& file, uint32_t& outRows, uint32_t& outCols)
 {
 	if (!exists(file))
 		throw std::runtime_error("CSV file does not exist: " + file.string());
@@ -72,7 +72,7 @@ std::vector<BT::LevelLoader::TileType>
 
 	return tiles;
 }
-void BT::LevelLoader::SpawnTileMap(const std::vector<TileType>& tiles, uint32_t rows, uint32_t cols, kob::Scene& scene,	float tileSize)
+void bt::LevelLoader::SpawnTileMap(const std::vector<TileType>& tiles, uint32_t rows, uint32_t cols, kob::Scene& scene,	float tileSize)
 {
 	for (uint32_t y{}; y < rows; ++y)
 	{
@@ -149,8 +149,24 @@ void BT::LevelLoader::SpawnTileMap(const std::vector<TileType>& tiles, uint32_t 
 				AddIngredientTile(TileType::Cheese, tiles, scene, "level/tiles/Cheese", x, y, cols, rows, tileSize);
 				break;
 			}
+			case TileType::Empty:
+			{
+				break;
+			}
 			default:
-				continue;
+			{
+				if (IsLadderAbove(tiles, x, y, cols, rows))
+				{
+					spritePath = GetLadderPlatformPath(x);
+					AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+				}
+				else
+				{
+					spritePath = GetPlatformPath(x);
+					AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+				}
+				break;
+			}
 			}
 		}
 	}
@@ -160,7 +176,7 @@ void BT::LevelLoader::SpawnTileMap(const std::vector<TileType>& tiles, uint32_t 
 //--------------------------------------------------
 //    Information
 //--------------------------------------------------
-int BT::LevelLoader::GetTileSubType(const std::vector<TileType>& tiles, uint32_t x, uint32_t y, uint32_t cols, TileType type)
+int bt::LevelLoader::GetTileSubType(const std::vector<TileType>& tiles, uint32_t x, uint32_t y, uint32_t cols, TileType type)
 {
 	uint32_t leftCol = x - 1;
 	uint32_t rightCol = x + 1;
@@ -187,7 +203,7 @@ int BT::LevelLoader::GetTileSubType(const std::vector<TileType>& tiles, uint32_t
 
 	return 0;
 }
-bool BT::LevelLoader::IsLadderAbove(const std::vector<TileType>& tiles, uint32_t x, uint32_t y, uint32_t cols, uint32_t rows)
+bool bt::LevelLoader::IsLadderAbove(const std::vector<TileType>& tiles, uint32_t x, uint32_t y, uint32_t cols, uint32_t rows)
 {
 	uint32_t upRow = y - 1;
 	if (upRow >= rows)
@@ -199,7 +215,7 @@ bool BT::LevelLoader::IsLadderAbove(const std::vector<TileType>& tiles, uint32_t
 	return false;
 }
 
-std::string BT::LevelLoader::GetPlatformPath(uint32_t x)
+std::string bt::LevelLoader::GetPlatformPath(uint32_t x)
 {
 	if (x % 4 == 0)
 		return "level/tiles/PlatformLight.png";
@@ -207,14 +223,14 @@ std::string BT::LevelLoader::GetPlatformPath(uint32_t x)
 		return "level/tiles/PlatformDark2.png";
 	return "level/tiles/PlatformDark.png";
 }
-std::string BT::LevelLoader::GetLadderPlatformPath(uint32_t x)
+std::string bt::LevelLoader::GetLadderPlatformPath(uint32_t x)
 {
 	if (x % 4 == 0)
 		return "level/tiles/LadderPlatformLight.png";
 	return "level/tiles/LadderPlatformDark.png";
 }
 
-void BT::LevelLoader::AddTileGameObject(kob::Scene& scene, const std::string& texturePath, const glm::uvec2& xy, float tileSize, const glm::vec2& offset)
+void bt::LevelLoader::AddTileGameObject(kob::Scene& scene, const std::string& texturePath, const glm::uvec2& xy, float tileSize, const glm::vec2& offset)
 {
 	auto& tileObj = scene.AddEmpty();
 	tileObj.SetLocalPosition({ xy.x * tileSize + offset.x, xy.y * tileSize + offset.y, 0 });
@@ -222,7 +238,7 @@ void BT::LevelLoader::AddTileGameObject(kob::Scene& scene, const std::string& te
 	if (!texturePath.empty())
 		tileObj.AddComponent<kob::ImageRendererComponent>(texturePath);
 }
-void BT::LevelLoader::AddIngredientTile(TileType type, const std::vector<TileType>& tiles, kob::Scene& scene, const std::string& basePath, uint32_t x, uint32_t y, uint32_t cols, uint32_t rows, float tileSize)
+void bt::LevelLoader::AddIngredientTile(TileType type, const std::vector<TileType>& tiles, kob::Scene& scene, const std::string& basePath, uint32_t x, uint32_t y, uint32_t cols, uint32_t rows, float tileSize)
 {
 	std::string spritePath{};
 	if (IsLadderAbove(tiles, x, y, cols, rows))

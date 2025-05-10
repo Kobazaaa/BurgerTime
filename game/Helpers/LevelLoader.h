@@ -4,7 +4,7 @@
 #include "vec2.hpp"
 
 namespace kob {	class Scene; }
-namespace BT
+namespace bt
 {
 	class LevelLoader
 	{
