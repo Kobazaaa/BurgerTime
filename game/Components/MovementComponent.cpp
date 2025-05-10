@@ -32,17 +32,16 @@ void bt::MovementComponent::Update()
 		return;
 	}
 
-	const auto pos = GetParent()->GetLocalTransform().GetPosition();
-	const auto centerPos = GetParent()->GetLocalTransform().GetPosition() + glm::vec3(16,16,0);
 
-	if (!(m_Dir.y > FLT_EPSILON && CanMoveDown(centerPos))
-		&& !(-m_Dir.y > FLT_EPSILON && CanMoveUp(centerPos)))
+	if (!(m_Dir.y > FLT_EPSILON && CanMoveDown())
+		&& !(-m_Dir.y > FLT_EPSILON && CanMoveUp()))
 		m_Dir.y = 0;
-	if (!(m_Dir.x > FLT_EPSILON && CanMoveRight(centerPos))
-		&& !(-m_Dir.x > FLT_EPSILON && CanMoveLeft(centerPos)))
+	if (!(m_Dir.x > FLT_EPSILON && CanMoveRight())
+		&& !(-m_Dir.x > FLT_EPSILON && CanMoveLeft()))
 		m_Dir.x = 0;
 
-	const auto newPos = pos + glm::vec3(m_Dir.x, m_Dir.y, 0) * kob::Timer::GetDeltaSeconds() * m_Speed;
+	const auto currPos = GetParent()->GetLocalTransform().GetPosition();
+	const auto newPos = currPos + glm::vec3(m_Dir.x, m_Dir.y, 0) * kob::Timer::GetDeltaSeconds() * m_Speed;
 	GetParent()->SetLocalPosition(newPos);
 
 	if (m_pAnimator)
@@ -69,36 +68,44 @@ void bt::MovementComponent::Move(const glm::vec2& direction)		{ m_Dir += normali
 void bt::MovementComponent::SetSpeed(float speed)					{ m_Speed = speed; }
 void bt::MovementComponent::SetCurrentLevel(LevelComponent& level)	{ m_pCurrentLevel = &level; }
 
-bool bt::MovementComponent::CanMoveUp(const glm::vec2& centerPos) const
+
+//--------------------------------------------------
+//    Helper
+//--------------------------------------------------
+bool bt::MovementComponent::CanMoveUp() const
 {
-	auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
+	const auto centerPos = GetParent()->GetWorldTransform().GetPosition();
+	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.y > m_pCurrentLevel->ColRowToCenterPos(colRow).y)
 		return true;
 	return m_pCurrentLevel->IsAlignedHorizontally(centerPos, m_AlignmentMargin)
 		&& m_pCurrentLevel->CanMoveTo(colRow.x, colRow.y - 1);
 }
 
-bool bt::MovementComponent::CanMoveDown(const glm::vec2& centerPos) const
+bool bt::MovementComponent::CanMoveDown() const
 {
-	auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
+	const auto centerPos = GetParent()->GetWorldTransform().GetPosition();
+	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.y < m_pCurrentLevel->ColRowToCenterPos(colRow).y)
 		return true;
 	return m_pCurrentLevel->IsAlignedHorizontally(centerPos, m_AlignmentMargin)
 		&& m_pCurrentLevel->CanMoveTo(colRow.x, colRow.y + 1);
 }
 
-bool bt::MovementComponent::CanMoveLeft(const glm::vec2& centerPos) const
+bool bt::MovementComponent::CanMoveLeft() const
 {
-	auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
+	const auto centerPos = GetParent()->GetWorldTransform().GetPosition();
+	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.x > m_pCurrentLevel->ColRowToCenterPos(colRow).x)
 		return true;
 	return m_pCurrentLevel->IsAlignedVertically(centerPos, m_AlignmentMargin)
 		&& m_pCurrentLevel->CanMoveTo(colRow.x - 1, colRow.y);
 }
 
-bool bt::MovementComponent::CanMoveRight(const glm::vec2& centerPos) const
+bool bt::MovementComponent::CanMoveRight() const
 {
-	auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
+	const auto centerPos = GetParent()->GetWorldTransform().GetPosition();
+	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.x < m_pCurrentLevel->ColRowToCenterPos(colRow).x)
 		return true;
 	return m_pCurrentLevel->IsAlignedVertically(centerPos, m_AlignmentMargin)

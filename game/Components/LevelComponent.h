@@ -56,15 +56,13 @@ namespace bt
 		uint32_t PosToIdx(const glm::vec3& pos) const;
 		glm::uvec2 PosToColRow(const glm::vec2& pos) const;
 		glm::uvec2 PosToColRow(const glm::vec3& pos) const;
-		glm::vec2 IdxToPos(uint32_t idx) const;
-		glm::vec2 ColRowToPos(const glm::uvec2& colRow) const;
 		glm::vec2 IdxToCenterPos(uint32_t idx) const;
 		glm::vec2 ColRowToCenterPos(const glm::uvec2& colRow) const;
 
 		bool IsIngredientTile(TileType tile) const;
 		bool IsAlignedVertically(const glm::vec2& pos, float threshold) const;
 		bool IsAlignedHorizontally(const glm::vec2& pos, float threshold) const;
-		bool CanMoveTo(uint32_t col, uint32_t row);
+		bool CanMoveTo(uint32_t col, uint32_t row) const;
 
 		//--------------------------------------------------
 		//    Accessors & Mutators

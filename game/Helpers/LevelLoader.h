@@ -27,7 +27,7 @@ namespace bt
 		static std::string GetPlatformPath(uint32_t x);
 		static std::string GetLadderPlatformPath(uint32_t x);
 
-		static void AddTileGameObject(kob::Scene& scene, const std::string& texturePath, const glm::uvec2& xy, float tileSize, const glm::vec2& offset = {});
+		static void AddTileGameObject(kob::Scene& scene, const std::string& texturePath, const glm::uvec2& xy, float tileSize, const glm::vec2& offset);
 		static void AddIngredientTile(TileType type, const std::vector<TileType>& tiles, kob::Scene& scene, const std::string& basePath, uint32_t x, uint32_t y, uint32_t cols, uint32_t rows, float tileSize);
 	};
 

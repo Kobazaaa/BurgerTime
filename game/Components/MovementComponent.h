@@ -33,10 +33,10 @@ namespace bt
 
 	private:
 		// Functions
-		bool CanMoveUp(const glm::vec2& centerPos) const;
-		bool CanMoveDown(const glm::vec2& centerPos) const;
-		bool CanMoveLeft(const glm::vec2& centerPos) const;
-		bool CanMoveRight(const glm::vec2& centerPos) const;
+		bool CanMoveUp() const;
+		bool CanMoveDown() const;
+		bool CanMoveLeft() const;
+		bool CanMoveRight() const;
 
 		// Data
 		float m_Speed{};

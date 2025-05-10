@@ -49,19 +49,11 @@ glm::uvec2 bt::LevelComponent::PosToColRow(const glm::vec3& pos) const
 {
 	return PosToColRow({pos.x, pos.y});
 }
-glm::vec2 bt::LevelComponent::IdxToPos(uint32_t idx) const
+glm::vec2 bt::LevelComponent::IdxToCenterPos(uint32_t idx) const
 {
 	const int x = idx % m_Cols;
 	const int y = idx / m_Cols;
-	return { x * m_TileSize, y * m_TileSize };
-}
-glm::vec2 bt::LevelComponent::ColRowToPos(const glm::uvec2& colRow) const
-{
-	return IdxToPos(colRow.y * m_Cols + colRow.x);
-}
-glm::vec2 bt::LevelComponent::IdxToCenterPos(uint32_t idx) const
-{
-	return IdxToPos(idx) + glm::vec2(m_TileSize / 2.f, m_TileSize / 2.f);
+	return { x * m_TileSize + m_TileSize / 2.f, y * m_TileSize + m_TileSize / 2.f };
 }
 glm::vec2 bt::LevelComponent::ColRowToCenterPos(const glm::uvec2& colRow) const
 {
@@ -81,17 +73,17 @@ bool bt::LevelComponent::IsIngredientTile(TileType tile) const
 bool bt::LevelComponent::IsAlignedVertically(const glm::vec2& pos, float threshold) const
 {
 	const auto i = PosToIdx(pos);
-	const auto p = IdxToPos(i);
+	const auto p = IdxToCenterPos(i);
 	return abs(p.y - pos.y) < threshold;
 }
 bool bt::LevelComponent::IsAlignedHorizontally(const glm::vec2& pos, float threshold) const
 {
 	const auto i = PosToIdx(pos);
-	const auto p = IdxToPos(i);
+	const auto p = IdxToCenterPos(i);
 	return abs(p.x - pos.x) < threshold;
 }
 
-bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row)
+bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row) const
 {
 	if (col >= m_Cols || row >= m_Rows)
 		return false;
@@ -113,9 +105,9 @@ bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row)
 		|| tile == TileType::BottomBun
 
 		|| tile == TileType::SpawnChef
-		//|| tile == TileType::SpawnEgg
-		//|| tile == TileType::SpawnHotDog
-		//|| tile == TileType::SpawnPickle
+		|| tile == TileType::SpawnEgg
+		|| tile == TileType::SpawnHotDog
+		|| tile == TileType::SpawnPickle
 	;
 }
 
@@ -123,7 +115,7 @@ bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row)
 //--------------------------------------------------
 //    Accessors & Mutators
 //--------------------------------------------------
-glm::vec2 bt::LevelComponent::GetChefSpawn()											const	{ return IdxToPos(m_ChefSpawn); }
+glm::vec2 bt::LevelComponent::GetChefSpawn()											const	{ return IdxToCenterPos(m_ChefSpawn); }
 bt::LevelComponent::TileType bt::LevelComponent::GetTileType(uint32_t idx)				const
 {
 	if (idx >= m_vTiles.size())

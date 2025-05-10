@@ -84,7 +84,7 @@ void bt::LevelLoader::SpawnTileMap(const std::vector<TileType>& tiles, uint32_t 
 			case TileType::Platform:
 			{
 				spritePath = GetPlatformPath(x);
-				AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+				AddTileGameObject(scene, spritePath, { x,y }, tileSize, { tileSize / 2, tileSize / 2 });
 				break;
 			}
 			case TileType::Plate:
@@ -110,13 +110,13 @@ void bt::LevelLoader::SpawnTileMap(const std::vector<TileType>& tiles, uint32_t 
 			case TileType::Ladder:
 			{
 				spritePath = "level/tiles/Ladder.png";
-				AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+				AddTileGameObject(scene, spritePath, { x,y }, tileSize, { tileSize / 2, tileSize / 2 });
 				break;
 			}
 			case TileType::LadderPlatform:
 			{
 				spritePath = GetLadderPlatformPath(x);
-				AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+				AddTileGameObject(scene, spritePath, { x,y }, tileSize, { tileSize / 2, tileSize / 2 });
 				break;
 			}
 			case TileType::BottomBun:
@@ -158,12 +158,12 @@ void bt::LevelLoader::SpawnTileMap(const std::vector<TileType>& tiles, uint32_t 
 				if (IsLadderAbove(tiles, x, y, cols, rows))
 				{
 					spritePath = GetLadderPlatformPath(x);
-					AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+					AddTileGameObject(scene, spritePath, { x,y }, tileSize, { tileSize / 2, tileSize / 2 });
 				}
 				else
 				{
 					spritePath = GetPlatformPath(x);
-					AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+					AddTileGameObject(scene, spritePath, { x,y }, tileSize, { tileSize / 2, tileSize / 2 });
 				}
 				break;
 			}
@@ -244,15 +244,16 @@ void bt::LevelLoader::AddIngredientTile(TileType type, const std::vector<TileTyp
 	if (IsLadderAbove(tiles, x, y, cols, rows))
 	{
 		spritePath = GetLadderPlatformPath(x);
-		AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+		AddTileGameObject(scene, spritePath, { x,y }, tileSize, {tileSize / 2, tileSize / 2});
 	}
 	else
 	{
 		spritePath = GetPlatformPath(x);
-		AddTileGameObject(scene, spritePath, { x,y }, tileSize);
+		AddTileGameObject(scene, spritePath, { x,y }, tileSize, { tileSize / 2, tileSize / 2 });
 	}
 
 	const float pieceSize = tileSize / 2;
+	const float pieceOffset = tileSize / 4;
 	for (int i{}; i < 2; ++i)
 	{
 		float offsetX = static_cast<float>(i % 2) * pieceSize;
@@ -268,6 +269,6 @@ void bt::LevelLoader::AddIngredientTile(TileType type, const std::vector<TileTyp
 		else
 			spritePath = basePath + "M2.png";
 
-		AddTileGameObject(scene, spritePath, { x,y }, tileSize, { offsetX, offsetY });
+		AddTileGameObject(scene, spritePath, { x,y }, tileSize, { offsetX + pieceOffset, offsetY + pieceOffset });
 	}
 }
