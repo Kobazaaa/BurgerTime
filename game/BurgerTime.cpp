@@ -32,11 +32,11 @@ void kob::Kobengine::Setup()
 	constexpr float WINDOW_HEIGHT = 624.f;
 	SetWindowSize(static_cast<int>(WINDOW_WIDTH), static_cast<int>(WINDOW_HEIGHT));
 	SetWindowTitle("Burger Time - Kobe Dereyne - 2GD10");
-	ServiceLocator<ISoundSystem>::GetService().Play("BGM.wav", 0.25f, -1);
+	ServiceLocator<ISoundSystem>::GetService().Play("sound/BGM.wav", 0.25f, -1);
 
 	constexpr float chefWalkDelay = 0.1f;
 	constexpr int chefTxtSize = 16;
-	auto chefSheet = ResourceManager::GetInstance().LoadSpriteSheet("ChefSheet.png",
+	auto chefSheet = ResourceManager::GetInstance().LoadSpriteSheet("characters/ChefSheet.png",
 		{
 			{"Down", {
 				{
@@ -74,7 +74,7 @@ void kob::Kobengine::Setup()
 	using namespace kob;
 	auto& scene = SceneManager::GetInstance().CreateScene("Demo");
 	//auto fontL = ResourceManager::GetInstance().LoadFont("arcade-legacy.otf", 18);
-	auto fontS = ResourceManager::GetInstance().LoadFont("arcade-legacy.otf", 8);
+	auto fontS = ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 8);
 	auto& inputManager = InputManager::GetInstance();
 	constexpr float speed = 50.f;
 
@@ -94,22 +94,22 @@ void kob::Kobengine::Setup()
 	// Chef
 	auto& chef = scene.AddEmpty();
 	const auto chefHealth = chef.AddComponent<HealthComponent>(4);
-	chefHealth->OnDamageTaken() += [] {	ServiceLocator<ISoundSystem>::GetService().Pause("BGM.wav"); ServiceLocator<ISoundSystem>::GetService().Play("Death.wav", 0.25f, 0); };
+	chefHealth->OnDamageTaken() += [] {	ServiceLocator<ISoundSystem>::GetService().Pause("sound/BGM.wav"); ServiceLocator<ISoundSystem>::GetService().Play("sound/Death.wav", 0.25f, 0); };
 	const auto chefScore = chef.AddComponent<ScoreComponent>();
 	const auto renderComp = chef.AddComponent<ImageRendererComponent>(chefSheet->GetTexture());
 	const auto animator = chef.AddComponent<Animator>(renderComp, chefSheet);
 	animator->Play("Down", false);
 	chef.SetLocalPosition(glm::vec3(289, 420, 0));
-	chef.SetLocalScale(glm::vec3(3, 3, 3));
+	chef.SetLocalScale(glm::vec3(2,2,2));
 
 	// Bean
 	auto& bean = scene.AddEmpty();
-	bean.AddComponent<ImageRendererComponent>("Bean.png");
+	bean.AddComponent<ImageRendererComponent>("characters/Bean.png");
 	const auto beanHealth = bean.AddComponent<HealthComponent>(3);
-	beanHealth->OnDamageTaken() += [] {	ServiceLocator<ISoundSystem>::GetService().Pause("BGM.wav"); ServiceLocator<ISoundSystem>::GetService().Play("Death.wav", 0.25f, 0); };
+	beanHealth->OnDamageTaken() += [] {	ServiceLocator<ISoundSystem>::GetService().Pause("sound/BGM.wav"); ServiceLocator<ISoundSystem>::GetService().Play("sound/Death.wav", 0.25f, 0); };
 	const auto beanScore = bean.AddComponent<ScoreComponent>();
 	bean.SetLocalPosition(glm::vec3(50, 300, 0));
-	bean.SetLocalScale(glm::vec3(3, 3, 1));
+	bean.SetLocalScale(glm::vec3(2, 2, 2));
 	bean.SetLocalRotation(glm::vec3(0, 0, 180));
 
 
@@ -161,8 +161,8 @@ void kob::Kobengine::Setup()
 	beanScoreUI->SetLocalPosition(glm::vec3(5, 220, 0));
 	scene.Add(std::move(beanScoreUI));
 
-	//auto& debugGrid = scene.AddEmpty();
-	//debugGrid.AddComponent<GridRendererComponent>(glm::vec2{ WINDOW_WIDTH, WINDOW_HEIGHT }, ROWS, COLS);
+	auto& debugGrid = scene.AddEmpty();
+	debugGrid.AddComponent<GridRendererComponent>(glm::vec2{ WINDOW_WIDTH, WINDOW_HEIGHT }, ROWS, COLS);
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~    Input Setup
@@ -189,3 +189,4 @@ void kob::Kobengine::Setup()
 	inputManager.RegisterKeyboardCmd(SDLK_z, TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 10));
 	inputManager.RegisterKeyboardCmd(SDLK_x, TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 100));
 }
+
