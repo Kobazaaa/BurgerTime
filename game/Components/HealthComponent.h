@@ -1,18 +1,16 @@
 #pragma once
-#include <memory>
-
 #include "Component.h"
 #include "Event.h"
 
-namespace kob
+namespace bt
 {
-	class HealthComponent final : public Component
+	class HealthComponent final : public kob::Component
 	{
 	public:
 		//--------------------------------------------------
 		//    Constructor
 		//--------------------------------------------------
-		explicit HealthComponent(GameObject& parent, int maxLives);
+		explicit HealthComponent(kob::GameObject& parent, int maxLives);
 
 
 		//--------------------------------------------------
@@ -35,9 +33,9 @@ namespace kob
 		//--------------------------------------------------
 		//    Events
 		//--------------------------------------------------
-		Event<int>& OnHealthChanged();
-		Event<>& OnDamageTaken();
-		Event<>& OnDeath();
+		kob::Event<int>& OnHealthChanged();
+		kob::Event<>& OnDamageTaken();
+		kob::Event<>& OnDeath();
 
 	private:
 		// Datamembers
@@ -45,8 +43,8 @@ namespace kob
 		int m_CurrentLives;
 
 		// Events
-		Event<int> m_OnHealthChanged;
-		Event<> m_OnDamageTaken;
-		Event<> m_OnDeath;
+		kob::Event<int> m_OnHealthChanged;
+		kob::Event<> m_OnDamageTaken;
+		kob::Event<> m_OnDeath;
 	};
 }

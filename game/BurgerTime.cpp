@@ -29,13 +29,13 @@
 
 void kob::Kobengine::Setup()
 {
-	uint32_t ROWS;
-	uint32_t COLS;
-	auto tiles = BT::LevelLoader::LoadCSV("./assets/level/Level01.csv", ROWS, COLS);
+	uint32_t rows;
+	uint32_t cols;
+	auto tiles = BT::LevelLoader::LoadCSV("./assets/level/Level01.csv", rows, cols);
 
-	float WINDOW_WIDTH  = COLS * 32.f;
-	float WINDOW_HEIGHT = ROWS * 32.f;
-	SetWindowSize(static_cast<int>(WINDOW_WIDTH), static_cast<int>(WINDOW_HEIGHT));
+	const float windowWidth  = cols * 32.f;
+	const float windowHeight = rows * 32.f;
+	SetWindowSize(static_cast<int>(windowWidth), static_cast<int>(windowHeight));
 	SetWindowTitle("Burger Time - Kobe Dereyne - 2GD10");
 	ServiceLocator<ISoundSystem>::GetService().Play("sound/BGM.wav", 0.25f, -1);
 
@@ -77,8 +77,9 @@ void kob::Kobengine::Setup()
 	// ~~    Setup
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	using namespace kob;
+	using namespace bt;
 	auto& scene = SceneManager::GetInstance().CreateScene("Demo");
-	BT::LevelLoader::SpawnTileMap(tiles, ROWS, COLS, scene, 32.f);
+	BT::LevelLoader::SpawnTileMap(tiles, rows, cols, scene, 32.f);
 
 	//auto fontL = ResourceManager::GetInstance().LoadFont("arcade-legacy.otf", 18);
 	auto fontS = ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 8);
@@ -169,7 +170,7 @@ void kob::Kobengine::Setup()
 	scene.Add(std::move(beanScoreUI));
 
 	auto& debugGrid = scene.AddEmpty();
-	debugGrid.AddComponent<GridRendererComponent>(glm::vec2{ WINDOW_WIDTH, WINDOW_HEIGHT }, ROWS, COLS);
+	debugGrid.AddComponent<GridRendererComponent>(glm::vec2{ windowWidth, windowHeight }, rows, cols);
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~    Input Setup

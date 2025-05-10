@@ -5,7 +5,7 @@
 //--------------------------------------------------
 //    Constructor
 //--------------------------------------------------
-kob::ScoreComponent::ScoreComponent(GameObject& parent)
+bt::ScoreComponent::ScoreComponent(kob::GameObject& parent)
 	: Component(parent)
 { }
 
@@ -13,18 +13,18 @@ kob::ScoreComponent::ScoreComponent(GameObject& parent)
 //--------------------------------------------------
 //    Loop
 //--------------------------------------------------
-void kob::ScoreComponent::Update()
+void bt::ScoreComponent::Update()
 { }
 
 
 //--------------------------------------------------
 //    Score
 //--------------------------------------------------
-int kob::ScoreComponent::GetScore() const
+int bt::ScoreComponent::GetScore() const
 {
 	return m_Score;
 }
-void kob::ScoreComponent::AddScore(int amount)
+void bt::ScoreComponent::AddScore(int amount)
 {
 	m_Score += amount;
 	m_OnScoreChange(m_Score);
@@ -34,7 +34,7 @@ void kob::ScoreComponent::AddScore(int amount)
 //--------------------------------------------------
 //    Events
 //--------------------------------------------------
-kob::Event<int>& kob::ScoreComponent::OnScoreChanged()
+kob::Event<int>& bt::ScoreComponent::OnScoreChanged()
 {
 	return m_OnScoreChange;
 }

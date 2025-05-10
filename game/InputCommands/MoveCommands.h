@@ -1,19 +1,18 @@
 #pragma once
-
 #include "Command.h"
 #include "GameObject.h"
 
-namespace kob
+namespace kob {	class Animator; }
+namespace bt
 {
-	class Animator;
-	class MoveCommand final : public Command
+	class MoveCommand final : public kob::Command
 	{
 	public:
-		MoveCommand(GameObject& gameobject, const glm::vec3& dir, float speed);
+		MoveCommand(kob::GameObject& gameObject, const glm::vec3& dir, float speed);
 		void Execute() override;
 	private:
-		GameObject* m_pGameObject;
-		Animator* m_pAnimator;
+		kob::GameObject* m_pGameObject;
+		kob::Animator* m_pAnimator;
 		glm::vec3 m_Direction;
 		float m_Speed;
 	};

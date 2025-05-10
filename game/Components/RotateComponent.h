@@ -2,15 +2,15 @@
 #include "Component.h"
 #include "vec2.hpp"
 
-namespace kob
+namespace bt
 {
-	class RotateComponent : public Component
+	class RotateComponent : public kob::Component
 	{
 	public:
 		//--------------------------------------------------
 		//    Constructor
 		//--------------------------------------------------
-		explicit RotateComponent(GameObject& parent, float speed, float radius);
+		explicit RotateComponent(kob::GameObject& parent, float speed, float radius);
 
 
 		//--------------------------------------------------

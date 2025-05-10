@@ -5,7 +5,7 @@
 //--------------------------------------------------
 //    Constructor
 //--------------------------------------------------
-kob::HealthComponent::HealthComponent(GameObject& parent, int maxLives)
+bt::HealthComponent::HealthComponent(kob::GameObject& parent, int maxLives)
 	: Component(parent)
 	, m_CurrentLives(maxLives)
 {
@@ -15,21 +15,21 @@ kob::HealthComponent::HealthComponent(GameObject& parent, int maxLives)
 //--------------------------------------------------
 //    Loop
 //--------------------------------------------------
-void kob::HealthComponent::Update() {}
+void bt::HealthComponent::Update() {}
 
 //--------------------------------------------------
 //    Health
 //--------------------------------------------------
-int kob::HealthComponent::GetCurrentLives() const
+int bt::HealthComponent::GetCurrentLives() const
 {
 	return m_CurrentLives;
 }
-int kob::HealthComponent::GetMaxLives() const
+int bt::HealthComponent::GetMaxLives() const
 {
 	return m_MaxLives;
 }
 
-void kob::HealthComponent::Damage(int amount)
+void bt::HealthComponent::Damage(int amount)
 {
 	const int oldLives = m_CurrentLives;
 	m_CurrentLives -= amount;
@@ -45,7 +45,7 @@ void kob::HealthComponent::Damage(int amount)
 		m_OnDeath();
 	}
 }
-void kob::HealthComponent::Kill()
+void bt::HealthComponent::Kill()
 {
 	if (m_CurrentLives != 0)
 		m_OnHealthChanged(m_CurrentLives);
@@ -53,7 +53,7 @@ void kob::HealthComponent::Kill()
 	m_OnDeath();
 }
 
-void kob::HealthComponent::Heal(int amount)
+void bt::HealthComponent::Heal(int amount)
 {
 	const int oldLives = m_CurrentLives;
 	m_CurrentLives += amount;
@@ -61,7 +61,7 @@ void kob::HealthComponent::Heal(int amount)
 	if (oldLives != m_CurrentLives)
 		m_OnHealthChanged(m_CurrentLives);
 }
-void kob::HealthComponent::Revive()
+void bt::HealthComponent::Revive()
 {
 	if (m_CurrentLives != m_MaxLives)
 		m_OnHealthChanged(m_CurrentLives);
@@ -73,17 +73,17 @@ void kob::HealthComponent::Revive()
 //--------------------------------------------------
 //    Events
 //--------------------------------------------------
-kob::Event<int>& kob::HealthComponent::OnHealthChanged()
+kob::Event<int>& bt::HealthComponent::OnHealthChanged()
 {
 	return m_OnHealthChanged;
 }
 
-kob::Event<>& kob::HealthComponent::OnDamageTaken()
+kob::Event<>& bt::HealthComponent::OnDamageTaken()
 {
 	return m_OnDamageTaken;
 }
 
-kob::Event<>& kob::HealthComponent::OnDeath()
+kob::Event<>& bt::HealthComponent::OnDeath()
 {
 	return m_OnDeath;
 }

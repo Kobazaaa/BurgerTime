@@ -1,11 +1,10 @@
 #pragma once
-
 #include "Command.h"
 #include "HealthComponent.h"
 
-namespace kob
+namespace bt
 {
-	class DamageCommand final : public Command
+	class DamageCommand final : public kob::Command
 	{
 	public:
 		DamageCommand(HealthComponent& healthComp, int amount = 1);

@@ -1,18 +1,16 @@
 #pragma once
-#include <memory>
-
 #include "Component.h"
 #include "Event.h"
 
-namespace kob
+namespace bt
 {
-	class ScoreComponent final : public Component
+	class ScoreComponent final : public kob::Component
 	{
 	public:
 		//--------------------------------------------------
 		//    Constructor
 		//--------------------------------------------------
-		explicit ScoreComponent(GameObject& parent);
+		explicit ScoreComponent(kob::GameObject& parent);
 
 
 		//--------------------------------------------------
@@ -30,13 +28,13 @@ namespace kob
 		//--------------------------------------------------
 		//    Events
 		//--------------------------------------------------
-		Event<int>& OnScoreChanged();
+		kob::Event<int>& OnScoreChanged();
 
 	private:
 		// Datamembers
 		int m_Score{ 0 };
 
 		// Events
-		Event<int> m_OnScoreChange;
+		kob::Event<int> m_OnScoreChange;
 	};
 }

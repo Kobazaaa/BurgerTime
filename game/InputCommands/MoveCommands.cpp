@@ -2,21 +2,21 @@
 #include "Timer.h"
 #include "Animator.h"
 
-kob::MoveCommand::MoveCommand(GameObject& gameobject, const glm::vec3& dir, float speed)
-	: m_pGameObject{ &gameobject }
+bt::MoveCommand::MoveCommand(kob::GameObject& gameObject, const glm::vec3& dir, float speed)
+	: m_pGameObject{ &gameObject }
 	, m_Speed{ speed }
 {
-	m_pAnimator = gameobject.GetComponent<Animator>();
+	m_pAnimator = gameObject.GetComponent<kob::Animator>();
 	// Normalize Direction
 	const float magnitude = std::sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
 	if (abs(magnitude) <= FLT_EPSILON) m_Direction = glm::vec3();
 	else m_Direction = dir / magnitude;
 }
 
-void kob::MoveCommand::Execute()
+void bt::MoveCommand::Execute()
 {
 	const auto& currPos = m_pGameObject->GetLocalTransform().GetPosition();
-	const auto newPos = currPos + m_Direction * m_Speed * Timer::GetDeltaSeconds();
+	const auto newPos = currPos + m_Direction * m_Speed * kob::Timer::GetDeltaSeconds();
 	m_pGameObject->SetLocalPosition(newPos);
 
 	if (!m_pAnimator)

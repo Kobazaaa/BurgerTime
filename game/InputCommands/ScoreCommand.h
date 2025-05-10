@@ -1,11 +1,10 @@
 #pragma once
-
 #include "Command.h"
 #include "ScoreComponent.h"
 
-namespace kob
+namespace bt
 {
-	class ScoreCommand final : public Command
+	class ScoreCommand final : public kob::Command
 	{
 	public:
 		ScoreCommand(ScoreComponent& scorecomp, int amount = 100);
