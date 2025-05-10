@@ -25,6 +25,9 @@ list(APPEND BURGER_TIME_SOURCES
     "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"     "${SOURCE_DIR}/InputCommands/DamageCommand.h"
     "${SOURCE_DIR}/InputCommands/MoveCommands.cpp"      "${SOURCE_DIR}/InputCommands/MoveCommands.h"
     "${SOURCE_DIR}/InputCommands/ScoreCommand.cpp"      "${SOURCE_DIR}/InputCommands/ScoreCommand.h"
+
+    # Helpers
+    "${SOURCE_DIR}/Helpers/LevelLoader.cpp"             "${SOURCE_DIR}/Helpers/LevelLoader.h"
 )
 
 # Create the executable
@@ -32,6 +35,7 @@ add_executable(${TARGET_NAME} ${BURGER_TIME_SOURCES})
 target_include_directories(${TARGET_NAME} PUBLIC
     "${SOURCE_DIR}/Components"
     "${SOURCE_DIR}/InputCommands"
+    "${SOURCE_DIR}/Helpers"
 )
 
 # Enable c++20 features

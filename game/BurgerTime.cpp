@@ -24,12 +24,17 @@
 #include "ScoreCommand.h"
 #include "SpriteSheet.h"
 
+#include "LevelLoader.h"
+#include <iostream>
+
 void kob::Kobengine::Setup()
 {
-	//constexpr uint32_t ROWS = 13;
-	//constexpr uint32_t COLS = 13;
-	constexpr float WINDOW_WIDTH = 624.f;
-	constexpr float WINDOW_HEIGHT = 624.f;
+	uint32_t ROWS;
+	uint32_t COLS;
+	auto tiles = BT::LevelLoader::LoadCSV("./assets/level/Level01.csv", ROWS, COLS);
+
+	float WINDOW_WIDTH  = COLS * 32.f;
+	float WINDOW_HEIGHT = ROWS * 32.f;
 	SetWindowSize(static_cast<int>(WINDOW_WIDTH), static_cast<int>(WINDOW_HEIGHT));
 	SetWindowTitle("Burger Time - Kobe Dereyne - 2GD10");
 	ServiceLocator<ISoundSystem>::GetService().Play("sound/BGM.wav", 0.25f, -1);
@@ -73,6 +78,8 @@ void kob::Kobengine::Setup()
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	using namespace kob;
 	auto& scene = SceneManager::GetInstance().CreateScene("Demo");
+	BT::LevelLoader::SpawnTileMap(tiles, ROWS, COLS, scene, 32.f);
+
 	//auto fontL = ResourceManager::GetInstance().LoadFont("arcade-legacy.otf", 18);
 	auto fontS = ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 8);
 	auto& inputManager = InputManager::GetInstance();
@@ -81,10 +88,10 @@ void kob::Kobengine::Setup()
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~    Background Setup
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	auto bg = std::make_unique<GameObject>();
-	bg->AddComponent<ImageRendererComponent>("Levels.png");
-	bg->SetLocalScale({ 3, 3, 3 });
-	scene.Add(std::move(bg));
+	//auto bg = std::make_unique<GameObject>();
+	//bg->AddComponent<ImageRendererComponent>("level/Levels.png");
+	//bg->SetLocalScale({ 3, 3, 3 });
+	//scene.Add(std::move(bg));
 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
