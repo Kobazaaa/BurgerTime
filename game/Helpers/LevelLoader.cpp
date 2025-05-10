@@ -22,6 +22,7 @@ std::vector<BT::LevelLoader::TileType>
 		throw std::runtime_error("Failed to open CSV file: " + file.string());
 
 	std::unordered_map<std::string, TileType> tileMap = {
+		{"", TileType::Empty},
 		{"E", TileType::Empty},
 		{"P", TileType::Platform},
 		{"PL", TileType::Plate},

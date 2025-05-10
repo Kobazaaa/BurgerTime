@@ -106,6 +106,7 @@ void kob::Kobengine::Setup()
 	const auto chefScore = chef.AddComponent<ScoreComponent>();
 	const auto renderComp = chef.AddComponent<ImageRendererComponent>(chefSheet->GetTexture());
 	const auto animator = chef.AddComponent<Animator>(renderComp, chefSheet);
+	const auto chefMovement = chef.AddComponent<MovementComponent>(speed);
 	animator->Play("Down", false);
 	chef.SetLocalPosition(glm::vec3(289, 420, 0));
 	chef.SetLocalScale(glm::vec3(2,2,2));
@@ -178,20 +179,20 @@ void kob::Kobengine::Setup()
 	inputManager.RegisterGamepad();
 
 	// Chef
-	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_UP,	 TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 0, -1, 0 }, 2 * speed), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_DOWN,  TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 0,  1, 0 }, 2 * speed), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_RIGHT, TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 1,  0, 0 }, 2 * speed), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_LEFT,  TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ -1,  0, 0 }, 2 * speed), 0);
-
-	inputManager.RegisterGamepadCmd(Gamepad::Button::X, TriggerState::Pressed, std::make_unique<DamageCommand>(*beanHealth), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::A, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 10), 0);
-	inputManager.RegisterGamepadCmd(Gamepad::Button::B, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 100), 0);
+	//inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_UP,	 TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 0, -1, 0 }, 2 * speed), 0);
+	//inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_DOWN,  TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 0,  1, 0 }, 2 * speed), 0);
+	//inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_RIGHT, TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ 1,  0, 0 }, 2 * speed), 0);
+	//inputManager.RegisterGamepadCmd(Gamepad::Button::DPAD_LEFT,  TriggerState::Down, std::make_unique<MoveCommand>(bean, glm::vec3{ -1,  0, 0 }, 2 * speed), 0);
+	//
+	//inputManager.RegisterGamepadCmd(Gamepad::Button::X, TriggerState::Pressed, std::make_unique<DamageCommand>(*beanHealth), 0);
+	//inputManager.RegisterGamepadCmd(Gamepad::Button::A, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 10), 0);
+	//inputManager.RegisterGamepadCmd(Gamepad::Button::B, TriggerState::Pressed, std::make_unique<ScoreCommand>(*beanScore, 100), 0);
 
 	// Bean
-	inputManager.RegisterKeyboardCmd(SDLK_w, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 0, -1, 0 }, speed));
-	inputManager.RegisterKeyboardCmd(SDLK_s, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 0,  1, 0 }, speed));
-	inputManager.RegisterKeyboardCmd(SDLK_d, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{ 1,  0, 0 }, speed));
-	inputManager.RegisterKeyboardCmd(SDLK_a, TriggerState::Down, std::make_unique<MoveCommand>(chef, glm::vec3{-1,  0, 0 }, speed));
+	inputManager.RegisterKeyboardCmd(SDLK_w, TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0, -1, 0 }));
+	inputManager.RegisterKeyboardCmd(SDLK_s, TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0,  1, 0 }));
+	inputManager.RegisterKeyboardCmd(SDLK_d, TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 1,  0, 0 }));
+	inputManager.RegisterKeyboardCmd(SDLK_a, TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{-1,  0, 0 }));
 
 	inputManager.RegisterKeyboardCmd(SDLK_c, TriggerState::Pressed, std::make_unique<DamageCommand>(*chefHealth));
 	inputManager.RegisterKeyboardCmd(SDLK_z, TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 10));
