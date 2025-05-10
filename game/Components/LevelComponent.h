@@ -1,7 +1,7 @@
 #pragma once
+#include <filesystem>
 #include "Component.h"
-#include "LevelLoader.h"
-#include "vec3.hpp"
+#include "glm.hpp"
 
 namespace bt
 {
@@ -20,27 +20,63 @@ namespace bt
 		void Start() override{};
 		void Update() override{};
 
+		//--------------------------------------------------
+		//    Enum
+		//--------------------------------------------------
+		enum class TileType
+		{
+			// Level Tiles
+			Empty,
+			Platform,
+			Plate,
+			HiddenLadder,
+			Ladder,
+			LadderPlatform,
+
+			// Ingredient Tiles
+			BottomBun,
+			TopBun,
+			Lettuce,
+			Burger,
+			Tomato,
+			Cheese,
+
+			// Spawn Point Tiles
+			SpawnHotDog,
+			SpawnEgg,
+			SpawnPickle,
+			SpawnChef
+		};
+
 
 		//--------------------------------------------------
 		//    Helpers
 		//--------------------------------------------------
 		uint32_t PosToIdx(const glm::vec2& pos) const;
 		uint32_t PosToIdx(const glm::vec3& pos) const;
-		glm::uvec2 PosToRowCol(const glm::vec2& pos) const;
-		glm::uvec2 PosToRowCol(const glm::vec3& pos) const;
+		glm::uvec2 PosToColRow(const glm::vec2& pos) const;
+		glm::uvec2 PosToColRow(const glm::vec3& pos) const;
 		glm::vec2 IdxToPos(uint32_t idx) const;
-		glm::vec2 RowColToPos(glm::uvec2 rowCol) const;
+		glm::vec2 ColRowToPos(const glm::uvec2& colRow) const;
+		glm::vec2 IdxToCenterPos(uint32_t idx) const;
+		glm::vec2 ColRowToCenterPos(const glm::uvec2& colRow) const;
+
+		bool IsIngredientTile(TileType tile) const;
+		bool IsAlignedVertically(const glm::vec2& pos, float threshold) const;
+		bool IsAlignedHorizontally(const glm::vec2& pos, float threshold) const;
+		bool CanMoveTo(uint32_t col, uint32_t row);
 
 		//--------------------------------------------------
 		//    Accessors & Mutators
 		//--------------------------------------------------
 		glm::vec2 GetChefSpawn() const;
-
+		TileType GetTileType(uint32_t idx) const;
+		TileType GetTileType(const glm::uvec2& colRow) const;
 
 	private:
 		uint32_t m_Rows{};
 		uint32_t m_Cols{};
-		std::vector<LevelLoader::TileType> m_vTiles;
+		std::vector<TileType> m_vTiles;
 		float m_TileSize{ 32.f };
 
 		uint32_t m_ChefSpawn{};

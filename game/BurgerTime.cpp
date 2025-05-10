@@ -31,13 +31,19 @@
 
 void kob::Kobengine::Setup()
 {
+	// Setup Data
+	constexpr float TILE_SIZE = 32.f;
+
 	constexpr uint32_t ROWS = 13;
 	constexpr uint32_t COLS = 17;
 
-	const float windowWidth  = COLS * 32.f;
-	const float windowHeight = ROWS * 32.f;
-	SetWindowSize(static_cast<int>(windowWidth), static_cast<int>(windowHeight));
+	constexpr float WINDOW_WIDTH  = COLS * TILE_SIZE;
+	constexpr float WINDOW_HEIGHT = ROWS * TILE_SIZE;
+
+	SetWindowSize(static_cast<int>(WINDOW_WIDTH), static_cast<int>(WINDOW_HEIGHT));
 	SetWindowTitle("Burger Time - Kobe Dereyne - 2GD10");
+
+	// Game Setup
 	ServiceLocator<ISoundSystem>::GetService().Play("sound/BGM.wav", 0.25f, -1);
 
 	constexpr float chefWalkDelay = 0.1f;
@@ -81,9 +87,9 @@ void kob::Kobengine::Setup()
 	using namespace bt;
 	auto& scene = SceneManager::GetInstance().CreateScene("GameScene");
 
-	auto& level01 = scene.AddEmpty();
+	auto& level01 = scene.AddEmpty("Level01");
 	auto levelcomp = level01.AddComponent<LevelComponent>("./assets/level/Level01.csv");
-	levelcomp->Build();
+	levelcomp->Build(TILE_SIZE);
 
 	//auto fontL = ResourceManager::GetInstance().LoadFont("arcade-legacy.otf", 18);
 	auto fontS = ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 8);
@@ -111,6 +117,7 @@ void kob::Kobengine::Setup()
 	const auto renderComp = chef.AddComponent<ImageRendererComponent>(chefSheet->GetTexture());
 	const auto animator = chef.AddComponent<Animator>(renderComp, chefSheet);
 	const auto chefMovement = chef.AddComponent<MovementComponent>(speed);
+	chefMovement->SetCurrentLevel(*levelcomp);
 	animator->Play("Down", false);
 	auto chefSpawn = levelcomp->GetChefSpawn();
 	chef.SetLocalPosition({ chefSpawn.x, chefSpawn.y, 0 });
@@ -176,7 +183,7 @@ void kob::Kobengine::Setup()
 	scene.Add(std::move(beanScoreUI));
 
 	auto& debugGrid = scene.AddEmpty();
-	debugGrid.AddComponent<GridRendererComponent>(glm::vec2{ windowWidth, windowHeight }, ROWS, COLS);
+	debugGrid.AddComponent<GridRendererComponent>(glm::vec2{ WINDOW_WIDTH, WINDOW_HEIGHT }, ROWS, COLS);
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// ~~    Input Setup

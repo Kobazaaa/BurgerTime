@@ -256,7 +256,7 @@ void bt::LevelLoader::AddIngredientTile(TileType type, const std::vector<TileTyp
 	for (int i{}; i < 2; ++i)
 	{
 		float offsetX = static_cast<float>(i % 2) * pieceSize;
-		float offsetY = 16.f;
+		float offsetY = pieceSize;
 
 		int subType = GetTileSubType(tiles, x, y, cols, type);
 		if (subType == -1 && abs(offsetX) <= FLT_EPSILON)
