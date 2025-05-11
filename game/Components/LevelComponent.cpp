@@ -1,4 +1,6 @@
 #include "LevelComponent.h"
+
+#include "ImageRendererComponent.h"
 #include "SceneManager.h"
 #include "LevelLoader.h"
 
@@ -19,10 +21,106 @@ bt::LevelComponent::LevelComponent(kob::GameObject& parent, const std::filesyste
 		}
 	}
 }
-void bt::LevelComponent::Build(float tileSize)
+
+void bt::LevelComponent::SpawnTileMap(float tileSize)
 {
 	m_TileSize = tileSize;
-	LevelLoader::SpawnTileMap(m_vTiles, m_Rows, m_Cols, *kob::SceneManager::GetInstance().GetScene(0), m_TileSize);
+	for (uint32_t y{}; y < m_Rows; ++y)
+	{
+		for (uint32_t x{}; x < m_Cols; ++x)
+		{
+			std::string spritePath{};
+			switch (m_vTiles[y * m_Cols + x])
+			{
+			case TileType::Platform:
+			{
+				spritePath = GetPlatformPath(x);
+				AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
+				break;
+			}
+			case TileType::Plate:
+			{
+				const float pieceSize = tileSize / 2;
+				for (int i{}; i < 2; ++i)
+				{
+					float offsetX = static_cast<float>(i % 2) * pieceSize;
+					float offsetY = 16.f;
+
+					int subType = GetTileSubType(x, y, TileType::Plate);
+					if (subType == -1 && abs(offsetX) <= FLT_EPSILON)
+						spritePath = "level/tiles/PlateL.png";
+					else if (subType == 1 && abs(offsetX) >= FLT_EPSILON)
+						spritePath = "level/tiles/PlateR.png";
+					else
+						spritePath = "level/tiles/PlateM.png";
+
+					AddTileGameObject(spritePath, { x,y }, { offsetX, offsetY });
+				}
+				break;
+			}
+			case TileType::Ladder:
+			{
+				spritePath = "level/tiles/Ladder.png";
+				AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
+				break;
+			}
+			case TileType::LadderPlatform:
+			{
+				spritePath = GetLadderPlatformPath(x);
+				AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
+				break;
+			}
+			case TileType::BottomBun:
+			{
+				AddIngredientTile(TileType::BottomBun, "level/tiles/BottomBun", x, y);
+				break;
+			}
+			case TileType::TopBun:
+			{
+				AddIngredientTile(TileType::TopBun, "level/tiles/TopBun", x, y);
+				break;
+			}
+			case TileType::Lettuce:
+			{
+				AddIngredientTile(TileType::Lettuce, "level/tiles/Lettuce", x, y);
+				break;
+			}
+			case TileType::Burger:
+			{
+				AddIngredientTile(TileType::Burger, "level/tiles/Burger", x, y);
+				break;
+			}
+			case TileType::Tomato:
+			{
+				AddIngredientTile(TileType::Tomato, "level/tiles/Tomato", x, y);
+				break;
+			}
+			case TileType::Cheese:
+			{
+				AddIngredientTile(TileType::Cheese, "level/tiles/Cheese", x, y);
+				break;
+			}
+			case TileType::Empty:
+			{
+				break;
+			}
+			default:
+			{
+				if (IsLadderAbove(x, y))
+				{
+					spritePath = GetLadderPlatformPath(x);
+					AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
+				}
+				else
+				{
+					spritePath = GetPlatformPath(x);
+					AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
+				}
+				break;
+			}
+			}
+		}
+	}
 }
 
 
@@ -125,4 +223,106 @@ bt::LevelComponent::TileType bt::LevelComponent::GetTileType(uint32_t idx)				co
 bt::LevelComponent::TileType bt::LevelComponent::GetTileType(const glm::uvec2& colRow)	const
 {
 	return GetTileType(colRow.y * m_Cols + colRow.x);
+}
+
+
+//--------------------------------------------------
+//    Information
+//--------------------------------------------------
+int bt::LevelComponent::GetTileSubType(uint32_t x, uint32_t y, TileType type) const
+{
+	uint32_t leftCol = x - 1;
+	uint32_t rightCol = x + 1;
+
+	if (leftCol == 0xFFFFFFFF)
+		return -1;
+	if (rightCol >= m_Cols)
+		return 1;
+
+	const uint32_t neighbourIdxL = y * m_Cols + leftCol;
+	const uint32_t neighbourIdxR = y * m_Cols + rightCol;
+
+	if (m_vTiles[neighbourIdxL] == type &&
+		m_vTiles[neighbourIdxR] == type)
+		return 0;
+
+	if (m_vTiles[neighbourIdxL] == type
+		&& m_vTiles[neighbourIdxR] != type)
+		return 1;
+
+	if (m_vTiles[neighbourIdxL] != type
+		&& m_vTiles[neighbourIdxR] == type)
+		return -1;
+
+	return 0;
+}
+bool bt::LevelComponent::IsLadderAbove(uint32_t x, uint32_t y) const
+{
+	uint32_t upRow = y - 1;
+	if (upRow >= m_Rows)
+		return false;
+
+	uint32_t neighbourIdxU = upRow * m_Cols + x;
+	if (m_vTiles[neighbourIdxU] == TileType::Ladder || m_vTiles[neighbourIdxU] == TileType::LadderPlatform)
+		return true;
+	return false;
+}
+
+std::string bt::LevelComponent::GetPlatformPath(uint32_t x) const
+{
+	if (x % 4 == 0)
+		return "level/tiles/PlatformLight.png";
+	if (x % 2 == 0)
+		return "level/tiles/PlatformDark2.png";
+	return "level/tiles/PlatformDark.png";
+}
+std::string bt::LevelComponent::GetLadderPlatformPath(uint32_t x) const
+{
+	if (x % 4 == 0)
+		return "level/tiles/LadderPlatformLight.png";
+	return "level/tiles/LadderPlatformDark.png";
+}
+
+void bt::LevelComponent::AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const
+{
+	auto& scene = GetParent()->GetScene();
+	auto& tileObj = scene.AddEmpty();
+	tileObj.SetLocalPosition({ xy.x * m_TileSize + offset.x, xy.y * m_TileSize + offset.y, 0 });
+	tileObj.SetLocalScale({ 2, 2, 2 });
+	if (!texturePath.empty())
+		tileObj.AddComponent<kob::ImageRendererComponent>(texturePath);
+}
+void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const
+{
+	std::string spritePath{};
+	if (IsLadderAbove(x, y))
+	{
+		spritePath = GetLadderPlatformPath(x);
+		AddTileGameObject(spritePath, { x,y }, { m_TileSize / 2, m_TileSize / 2 });
+	}
+	else
+	{
+		spritePath = GetPlatformPath(x);
+		AddTileGameObject(spritePath, { x,y }, { m_TileSize / 2, m_TileSize / 2 });
+	}
+
+	const float pieceSize = m_TileSize / 2;
+	const float pieceOffset = m_TileSize / 4;
+	for (int i{}; i < 2; ++i)
+	{
+		float offsetX = static_cast<float>(i % 2) * pieceSize;
+		float offsetY = pieceSize;
+
+		int subType = GetTileSubType(x, y, type);
+		if (subType == -1 && abs(offsetX) <= FLT_EPSILON)
+			spritePath = basePath + "L.png";
+		else if (subType == 1 && abs(offsetX) >= FLT_EPSILON)
+			spritePath = basePath + "R.png";
+		else if (abs(offsetX) >= FLT_EPSILON)
+			spritePath = basePath + "M1.png";
+		else
+			spritePath = basePath + "M2.png";
+
+		AddTileGameObject(spritePath, { x,y }, { offsetX + pieceOffset, offsetY + pieceOffset });
+	}
 }

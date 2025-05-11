@@ -2,6 +2,7 @@
 #include <filesystem>
 #include "Component.h"
 #include "glm.hpp"
+#include "Scene.h"
 
 namespace bt
 {
@@ -12,7 +13,7 @@ namespace bt
 		//    Constructor
 		//--------------------------------------------------
 		explicit LevelComponent(kob::GameObject& parent, const std::filesystem::path& levelPath);
-		void Build(float tileSize = 32.f);
+		void SpawnTileMap(float tileSize = 32.f);
 
 		//--------------------------------------------------
 		//    Loop
@@ -71,6 +72,19 @@ namespace bt
 		TileType GetTileType(const glm::uvec2& colRow) const;
 
 	private:
+		//--------------------------------------------------
+		//    Information
+		//--------------------------------------------------
+		int GetTileSubType(uint32_t x, uint32_t y, TileType type) const;
+		bool IsLadderAbove(uint32_t x, uint32_t y) const;
+
+		std::string GetPlatformPath(uint32_t x) const;
+		std::string GetLadderPlatformPath(uint32_t x) const;
+
+		void AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const;
+		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const;
+
+		// Data 
 		uint32_t m_Rows{};
 		uint32_t m_Cols{};
 		std::vector<TileType> m_vTiles;
