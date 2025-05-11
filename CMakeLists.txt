@@ -17,6 +17,7 @@ list(APPEND BURGER_TIME_SOURCES
 	"${SOURCE_DIR}/BurgerTime.cpp"
 
     # Components
+    "${SOURCE_DIR}/Components/GameManagerComponent.cpp" "${SOURCE_DIR}/Components/GameManagerComponent.h"
     "${SOURCE_DIR}/Components/HealthComponent.cpp"      "${SOURCE_DIR}/Components/HealthComponent.h"
     "${SOURCE_DIR}/Components/RotateComponent.cpp"      "${SOURCE_DIR}/Components/RotateComponent.h"
     "${SOURCE_DIR}/Components/ScoreComponent.cpp"       "${SOURCE_DIR}/Components/ScoreComponent.h"
@@ -30,14 +31,18 @@ list(APPEND BURGER_TIME_SOURCES
 
     # Helpers
     "${SOURCE_DIR}/Helpers/LevelLoader.cpp"             "${SOURCE_DIR}/Helpers/LevelLoader.h"
+
+    # State
+    "${SOURCE_DIR}/State/IGameState.h"
 )
 
 # Create the executable
 add_executable(${TARGET_NAME} ${BURGER_TIME_SOURCES})
 target_include_directories(${TARGET_NAME} PUBLIC
     "${SOURCE_DIR}/Components"
-    "${SOURCE_DIR}/InputCommands"
     "${SOURCE_DIR}/Helpers"
+    "${SOURCE_DIR}/InputCommands"
+    "${SOURCE_DIR}/State"
 )
 
 # Enable c++20 features
