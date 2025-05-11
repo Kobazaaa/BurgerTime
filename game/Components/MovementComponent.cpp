@@ -64,9 +64,9 @@ void bt::MovementComponent::Update()
 //--------------------------------------------------
 //    Accessors & Mutators
 //--------------------------------------------------
-void bt::MovementComponent::Move(const glm::vec2& direction)		{ m_Dir += normalize(direction); }
-void bt::MovementComponent::SetSpeed(float speed)					{ m_Speed = speed; }
-void bt::MovementComponent::SetCurrentLevel(LevelComponent& level)	{ m_pCurrentLevel = &level; }
+void bt::MovementComponent::Move(const glm::vec2& direction)				{ m_Dir += normalize(direction); }
+void bt::MovementComponent::SetSpeed(float speed)							{ m_Speed = speed; }
+void bt::MovementComponent::SetCurrentLevel(const LevelComponent& level)	{ m_pCurrentLevel = &level; }
 
 
 //--------------------------------------------------

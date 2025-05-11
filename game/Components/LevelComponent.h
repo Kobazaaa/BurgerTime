@@ -71,6 +71,9 @@ namespace bt
 		TileType GetTileType(uint32_t idx) const;
 		TileType GetTileType(const glm::uvec2& colRow) const;
 
+		glm::uvec2 GetColRow() const;
+		float GetTileSize() const;
+
 	private:
 		//--------------------------------------------------
 		//    Information
@@ -83,6 +86,7 @@ namespace bt
 
 		void AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const;
 		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const;
+		void SpawnChef() const;
 
 		// Data 
 		uint32_t m_Rows{};

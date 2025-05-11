@@ -29,7 +29,7 @@ namespace bt
 		//--------------------------------------------------
 		void Move(const glm::vec2& direction);
 		void SetSpeed(float speed);
-		void SetCurrentLevel(LevelComponent& level);
+		void SetCurrentLevel(const LevelComponent& level);
 
 	private:
 		// Functions
@@ -43,6 +43,6 @@ namespace bt
 		glm::vec2 m_Dir{};
 		float m_AlignmentMargin{ 2.f };
 		kob::Animator* m_pAnimator;
-		LevelComponent* m_pCurrentLevel;
+		const LevelComponent* m_pCurrentLevel;
 	};
 }

@@ -1,8 +1,18 @@
 #include "LevelComponent.h"
 
+#include "Animator.h"
+#include "DamageCommand.h"
+#include "HealthComponent.h"
 #include "ImageRendererComponent.h"
+#include "InputManager.h"
 #include "SceneManager.h"
 #include "LevelLoader.h"
+#include "MoveCommands.h"
+#include "MovementComponent.h"
+#include "ResourceManager.h"
+#include "ScoreCommand.h"
+#include "ScoreComponent.h"
+#include "ServiceLocator.h"
 
 //--------------------------------------------------
 //    Constructor
@@ -41,6 +51,7 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 			case TileType::Plate:
 			{
 				const float pieceSize = tileSize / 2;
+				const float pieceOffset = tileSize / 4;
 				for (int i{}; i < 2; ++i)
 				{
 					float offsetX = static_cast<float>(i % 2) * pieceSize;
@@ -54,7 +65,7 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 					else
 						spritePath = "level/tiles/PlateM.png";
 
-					AddTileGameObject(spritePath, { x,y }, { offsetX, offsetY });
+					AddTileGameObject(spritePath, { x,y }, { offsetX + pieceOffset, offsetY + pieceOffset });
 				}
 				break;
 			}
@@ -121,6 +132,7 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 			}
 		}
 	}
+	SpawnChef();
 }
 
 
@@ -225,6 +237,9 @@ bt::LevelComponent::TileType bt::LevelComponent::GetTileType(const glm::uvec2& c
 	return GetTileType(colRow.y * m_Cols + colRow.x);
 }
 
+glm::uvec2 bt::LevelComponent::GetColRow() const { return {m_Cols, m_Rows}; }
+float bt::LevelComponent::GetTileSize() const { return m_TileSize; }
+
 
 //--------------------------------------------------
 //    Information
@@ -287,6 +302,7 @@ void bt::LevelComponent::AddTileGameObject(const std::string& texturePath, const
 {
 	auto& scene = GetParent()->GetScene();
 	auto& tileObj = scene.AddEmpty();
+	tileObj.SetParent(GetParent());
 	tileObj.SetLocalPosition({ xy.x * m_TileSize + offset.x, xy.y * m_TileSize + offset.y, 0 });
 	tileObj.SetLocalScale({ 2, 2, 2 });
 	if (!texturePath.empty())
@@ -325,4 +341,67 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 
 		AddTileGameObject(spritePath, { x,y }, { offsetX + pieceOffset, offsetY + pieceOffset });
 	}
+}
+void bt::LevelComponent::SpawnChef() const
+{
+	constexpr float chefWalkDelay = 0.1f;
+	constexpr int chefTxtSize = 16;
+	constexpr float speed = 50.f;
+	auto chefSheet = kob::ResourceManager::GetInstance().LoadSpriteSheet("characters/ChefSheet.png",
+	        {
+		        {"Down", {
+			        {
+			            { 0, 16, chefTxtSize, chefTxtSize},
+			            {16, 16, chefTxtSize, chefTxtSize},
+			            {32, 16, chefTxtSize, chefTxtSize},
+			            {16, 16, chefTxtSize, chefTxtSize},
+			        }, chefWalkDelay} },
+		        {"Up", {
+			        {
+			            { 96, 16, chefTxtSize, chefTxtSize},
+			            {112, 16, chefTxtSize, chefTxtSize},
+			            {128, 16, chefTxtSize, chefTxtSize},
+			            {112, 16, chefTxtSize, chefTxtSize},
+			        }, chefWalkDelay} },
+		        {"Left", {
+			        {
+			            {48, 16, chefTxtSize, chefTxtSize},
+			            {64, 16, chefTxtSize, chefTxtSize},
+			            {80, 16, chefTxtSize, chefTxtSize},
+			            {64, 16, chefTxtSize, chefTxtSize},
+			        }, chefWalkDelay} },
+		        {"Right", {
+			        {
+			            {48, 0, chefTxtSize, chefTxtSize},
+			            {64, 0, chefTxtSize, chefTxtSize},
+			            {80, 0, chefTxtSize, chefTxtSize},
+			            {64, 0, chefTxtSize, chefTxtSize},
+			        }, chefWalkDelay} }
+	        });
+	
+	auto& scene = GetParent()->GetScene();
+	auto& chef = scene.AddEmpty("Player1");
+	chef.SetParent(GetParent());
+	const auto chefHealth = chef.AddComponent<HealthComponent>(4);
+	chefHealth->OnDamageTaken() += [] { kob::ServiceLocator<kob::ISoundSystem>::GetService().Pause("sound/BGM.wav");
+		kob::ServiceLocator<kob::ISoundSystem>::GetService().Play("sound/Death.wav", 0.25f, 0); };
+	auto chefScore = chef.AddComponent<ScoreComponent>();
+	const auto renderComp = chef.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());
+	const auto animator = chef.AddComponent<kob::Animator>(renderComp, chefSheet);
+	const auto chefMovement = chef.AddComponent<MovementComponent>(speed);
+	chefMovement->SetCurrentLevel(*this);
+	animator->Play("Down", false);
+	auto chefSpawn = GetChefSpawn();
+	chef.SetLocalPosition({ chefSpawn.x, chefSpawn.y, 0 });
+	chef.SetLocalScale(glm::vec3(2, 2, 2));
+
+	auto& inputManager = kob::InputManager::GetInstance();
+	inputManager.RegisterKeyboardCmd(SDLK_w, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0, -1, 0 }));
+	inputManager.RegisterKeyboardCmd(SDLK_s, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0,  1, 0 }));
+	inputManager.RegisterKeyboardCmd(SDLK_d, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 1,  0, 0 }));
+	inputManager.RegisterKeyboardCmd(SDLK_a, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ -1,  0, 0 }));
+
+	inputManager.RegisterKeyboardCmd(SDLK_c, kob::TriggerState::Pressed, std::make_unique<DamageCommand>(*chefHealth));
+	inputManager.RegisterKeyboardCmd(SDLK_z, kob::TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 10));
+	inputManager.RegisterKeyboardCmd(SDLK_x, kob::TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 100));
 }

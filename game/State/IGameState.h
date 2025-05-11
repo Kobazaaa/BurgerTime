@@ -8,10 +8,14 @@ namespace bt
 		//--------------------------------------------------
 		//    Constructor & Destructor
 		//--------------------------------------------------
-		IGameState(GameManagerComponent& gameManagerComp)
+		explicit IGameState(GameManagerComponent& gameManagerComp)
 			: m_pGameManagerComp{ &gameManagerComp }
-		{};
+		{}
 		virtual ~IGameState() = default;
+		IGameState(const IGameState& other) = default;
+		IGameState(IGameState&& other) noexcept = default;
+		IGameState& operator=(const IGameState& other) = default;
+		IGameState& operator=(IGameState&& other) noexcept = default;
 
 		//--------------------------------------------------
 		//    Interface

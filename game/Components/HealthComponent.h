@@ -43,8 +43,8 @@ namespace bt
 		int m_CurrentLives;
 
 		// Events
-		kob::Event<int> m_OnHealthChanged;
-		kob::Event<> m_OnDamageTaken;
-		kob::Event<> m_OnDeath;
+		kob::Event<int> m_OnHealthChanged{};
+		kob::Event<> m_OnDamageTaken{};
+		kob::Event<> m_OnDeath{};
 	};
 }

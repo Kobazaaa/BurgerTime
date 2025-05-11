@@ -27,6 +27,7 @@ list(APPEND BURGER_TIME_SOURCES
     # Commands
     "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"     "${SOURCE_DIR}/InputCommands/DamageCommand.h"
     "${SOURCE_DIR}/InputCommands/MoveCommands.cpp"      "${SOURCE_DIR}/InputCommands/MoveCommands.h"
+    "${SOURCE_DIR}/InputCommands/StateCommands.cpp"     "${SOURCE_DIR}/InputCommands/StateCommands.h"
     "${SOURCE_DIR}/InputCommands/ScoreCommand.cpp"      "${SOURCE_DIR}/InputCommands/ScoreCommand.h"
 
     # Helpers
@@ -34,6 +35,9 @@ list(APPEND BURGER_TIME_SOURCES
 
     # State
     "${SOURCE_DIR}/State/IGameState.h"
+    "${SOURCE_DIR}/State/GamePlayingState.cpp"          "${SOURCE_DIR}/State/GamePlayingState.h"
+    "${SOURCE_DIR}/State/GameMenuState.cpp"             "${SOURCE_DIR}/State/GameMenuState.h"
+    "${SOURCE_DIR}/State/GameLeaderboardState.cpp"      "${SOURCE_DIR}/State/GameLeaderboardState.h"
 )
 
 # Create the executable
