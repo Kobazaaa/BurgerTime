@@ -1,4 +1,5 @@
-// SDL
+// STANDARD
+#include <iostream>
 #include <SDL.h>
 
 // ENGINE
@@ -8,6 +9,9 @@
 #include "ResourceManager.h"
 #include "Scene.h"
 #include "InputManager.h"
+#include "Renderer.h"
+
+#include "LevelLoader.h"
 
 // COMPONENTS
 #include "IntUIComponent.h"
@@ -16,6 +20,8 @@
 #include "HealthComponent.h"
 #include "ScoreComponent.h"
 #include "GridRendererComponent.h"
+#include "GameManagerComponent.h"
+#include "LevelComponent.h"
 
 // COMMANDS
 #include "Animator.h"
@@ -24,11 +30,6 @@
 #include "ScoreCommand.h"
 #include "SpriteSheet.h"
 
-#include "LevelLoader.h"
-#include <iostream>
-
-#include "GameManagerComponent.h"
-#include "LevelComponent.h"
 
 void kob::Kobengine::Setup()
 {
@@ -47,6 +48,8 @@ void kob::Kobengine::Setup()
 
 	SetWindowSize(static_cast<int>(WINDOW_WIDTH), static_cast<int>(WINDOW_HEIGHT));
 	SetWindowTitle("Burger Time - Kobe Dereyne - 2GD10");
+	//Renderer::GetInstance().SetGlobalScale(2);
+	//Renderer::GetInstance().SetLogicalSize(static_cast<int>(WINDOW_WIDTH), static_cast<int>(WINDOW_HEIGHT));
 
 	// Game Setup
 	auto& scene = SceneManager::GetInstance().CreateScene("GameScene");

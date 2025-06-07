@@ -383,8 +383,8 @@ void bt::LevelComponent::SpawnChef() const
 	auto& chef = scene.AddEmpty("Player1");
 	chef.SetParent(GetParent());
 	const auto chefHealth = chef.AddComponent<HealthComponent>(4);
-	chefHealth->OnDamageTaken() += [] { kob::ServiceLocator<kob::ISoundSystem>::GetService().Pause("sound/BGM.wav");
-		kob::ServiceLocator<kob::ISoundSystem>::GetService().Play("sound/Death.wav", 0.25f, 0); };
+	chefHealth->OnDamageTaken() += [] { kob::ServiceLocator::GetSoundService().Pause("sound/BGM.wav");
+	kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 0.25f, 0); };
 	auto chefScore = chef.AddComponent<ScoreComponent>();
 	const auto renderComp = chef.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());
 	const auto animator = chef.AddComponent<kob::Animator>(renderComp, chefSheet);
