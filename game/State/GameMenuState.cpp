@@ -14,11 +14,11 @@
 bt::GameMenuState::GameMenuState(GameManagerComponent& gameManagerComp)
 	: IGameState(gameManagerComp)
 {
-	auto& scene = GetGameManager()->GetParent()->GetScene();
+	auto& scene = GetGameManager()->GetGameObject()->GetScene();
 	const auto windowSize = kob::Kobengine::GetWindowSize();
 
 	m_pMenuObject = &scene.AddEmpty("StartMenu");
-	m_pMenuObject->SetParent(GetGameManager()->GetParent());
+	m_pMenuObject->SetParent(GetGameManager()->GetGameObject());
 
 	//Background
 	auto& background = scene.AddEmpty("Background");

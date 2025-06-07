@@ -21,5 +21,5 @@ void bt::RotateComponent::Update()
 {
 	float x = m_Radius * cos(m_Speed * kob::Timer::GetTotalTimeSeconds());
 	float y = m_Radius * sin(m_Speed * kob::Timer::GetTotalTimeSeconds());
-	GetParent()->SetLocalPosition(glm::vec3(x, y, 0));
+	GetGameObject()->SetLocalPosition(glm::vec3(x, y, 0));
 }

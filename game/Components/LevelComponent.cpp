@@ -300,9 +300,9 @@ std::string bt::LevelComponent::GetLadderPlatformPath(uint32_t x) const
 
 void bt::LevelComponent::AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const
 {
-	auto& scene = GetParent()->GetScene();
+	auto& scene = GetGameObject()->GetScene();
 	auto& tileObj = scene.AddEmpty();
-	tileObj.SetParent(GetParent());
+	tileObj.SetParent(GetGameObject());
 	tileObj.SetLocalPosition({ xy.x * m_TileSize + offset.x, xy.y * m_TileSize + offset.y, 0 });
 	tileObj.SetLocalScale({ 2, 2, 2 });
 	if (!texturePath.empty())
@@ -379,9 +379,9 @@ void bt::LevelComponent::SpawnChef() const
 			        }, chefWalkDelay} }
 	        });
 	
-	auto& scene = GetParent()->GetScene();
+	auto& scene = GetGameObject()->GetScene();
 	auto& chef = scene.AddEmpty("Player1");
-	chef.SetParent(GetParent());
+	chef.SetParent(GetGameObject());
 	const auto chefHealth = chef.AddComponent<HealthComponent>(4);
 	chefHealth->OnDamageTaken() += [] { kob::ServiceLocator::GetSoundService().Pause("sound/BGM.wav");
 	kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 0.25f, 0); };

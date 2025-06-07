@@ -21,7 +21,7 @@ bt::MovementComponent::MovementComponent(kob::GameObject& parent, float speed)
 //--------------------------------------------------
 void bt::MovementComponent::Start()
 {
-	m_pAnimator = GetParent()->GetComponent<kob::Animator>();
+	m_pAnimator = GetGameObject()->GetComponent<kob::Animator>();
 }
 void bt::MovementComponent::Update()
 {
@@ -40,9 +40,9 @@ void bt::MovementComponent::Update()
 		&& !(-m_Dir.x > FLT_EPSILON && CanMoveLeft()))
 		m_Dir.x = 0;
 
-	const auto currPos = GetParent()->GetLocalTransform().GetPosition();
+	const auto currPos = GetGameObject()->GetLocalTransform().GetPosition();
 	const auto newPos = currPos + glm::vec3(m_Dir.x, m_Dir.y, 0) * kob::Timer::GetDeltaSeconds() * m_Speed;
-	GetParent()->SetLocalPosition(newPos);
+	GetGameObject()->SetLocalPosition(newPos);
 
 	if (m_pAnimator)
 	{
@@ -74,7 +74,7 @@ void bt::MovementComponent::SetCurrentLevel(const LevelComponent& level)	{ m_pCu
 //--------------------------------------------------
 bool bt::MovementComponent::CanMoveUp() const
 {
-	const auto centerPos = GetParent()->GetWorldTransform().GetPosition();
+	const auto centerPos = GetGameObject()->GetWorldTransform().GetPosition();
 	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.y > m_pCurrentLevel->ColRowToCenterPos(colRow).y)
 		return true;
@@ -84,7 +84,7 @@ bool bt::MovementComponent::CanMoveUp() const
 
 bool bt::MovementComponent::CanMoveDown() const
 {
-	const auto centerPos = GetParent()->GetWorldTransform().GetPosition();
+	const auto centerPos = GetGameObject()->GetWorldTransform().GetPosition();
 	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.y < m_pCurrentLevel->ColRowToCenterPos(colRow).y)
 		return true;
@@ -94,7 +94,7 @@ bool bt::MovementComponent::CanMoveDown() const
 
 bool bt::MovementComponent::CanMoveLeft() const
 {
-	const auto centerPos = GetParent()->GetWorldTransform().GetPosition();
+	const auto centerPos = GetGameObject()->GetWorldTransform().GetPosition();
 	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.x > m_pCurrentLevel->ColRowToCenterPos(colRow).x)
 		return true;
@@ -104,7 +104,7 @@ bool bt::MovementComponent::CanMoveLeft() const
 
 bool bt::MovementComponent::CanMoveRight() const
 {
-	const auto centerPos = GetParent()->GetWorldTransform().GetPosition();
+	const auto centerPos = GetGameObject()->GetWorldTransform().GetPosition();
 	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.x < m_pCurrentLevel->ColRowToCenterPos(colRow).x)
 		return true;

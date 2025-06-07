@@ -33,9 +33,9 @@ void bt::GamePlayingState::OnEnter()
 	m_EndGame = false;
 
 	// Level
-	auto& scene = GetGameManager()->GetParent()->GetScene();
+	auto& scene = GetGameManager()->GetGameObject()->GetScene();
 	m_pLevelObject = &scene.AddEmpty("Level");
-	m_pLevelObject->SetParent(GetGameManager()->GetParent());
+	m_pLevelObject->SetParent(GetGameManager()->GetGameObject());
 	auto comp = m_pLevelObject->AddComponent<LevelComponent>("./assets/level/Level01.csv");
 	comp->SpawnTileMap();
 
