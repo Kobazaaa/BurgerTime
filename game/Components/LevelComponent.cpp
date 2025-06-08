@@ -9,6 +9,9 @@
 #include "LevelLoader.h"
 #include "MoveCommands.h"
 #include "MovementComponent.h"
+#include "ColliderComponent.h"
+#include "IngredientTileComponent.h"
+#include "IngredientComponent.h"
 #include "ResourceManager.h"
 #include "ScoreCommand.h"
 #include "ScoreComponent.h"
@@ -83,32 +86,38 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 			}
 			case TileType::BottomBun:
 			{
-				AddIngredientTile(TileType::BottomBun, "level/tiles/BottomBun", x, y);
+				if (GetTileSubType(x, y, TileType::BottomBun) == -1)
+					AddIngredientTile(TileType::BottomBun, "level/tiles/BottomBun", x, y);
 				break;
 			}
 			case TileType::TopBun:
 			{
-				AddIngredientTile(TileType::TopBun, "level/tiles/TopBun", x, y);
+				if (GetTileSubType(x, y, TileType::TopBun) == -1)
+					AddIngredientTile(TileType::TopBun, "level/tiles/TopBun", x, y);
 				break;
 			}
 			case TileType::Lettuce:
 			{
-				AddIngredientTile(TileType::Lettuce, "level/tiles/Lettuce", x, y);
+				if (GetTileSubType(x, y, TileType::Lettuce) == -1)
+					AddIngredientTile(TileType::Lettuce, "level/tiles/Lettuce", x, y);
 				break;
 			}
 			case TileType::Burger:
 			{
-				AddIngredientTile(TileType::Burger, "level/tiles/Burger", x, y);
+				if (GetTileSubType(x, y, TileType::Burger) == -1)
+					AddIngredientTile(TileType::Burger, "level/tiles/Burger", x, y);
 				break;
 			}
 			case TileType::Tomato:
 			{
-				AddIngredientTile(TileType::Tomato, "level/tiles/Tomato", x, y);
+				if (GetTileSubType(x, y, TileType::Tomato) == -1)
+					AddIngredientTile(TileType::Tomato, "level/tiles/Tomato", x, y);
 				break;
 			}
 			case TileType::Cheese:
 			{
-				AddIngredientTile(TileType::Cheese, "level/tiles/Cheese", x, y);
+				if (GetTileSubType(x, y, TileType::Cheese) == -1)
+					AddIngredientTile(TileType::Cheese, "level/tiles/Cheese", x, y);
 				break;
 			}
 			case TileType::Empty:
@@ -298,7 +307,7 @@ std::string bt::LevelComponent::GetLadderPlatformPath(uint32_t x) const
 	return "level/tiles/LadderPlatformDark.png";
 }
 
-void bt::LevelComponent::AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const
+kob::GameObject& bt::LevelComponent::AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const
 {
 	auto& scene = GetGameObject()->GetScene();
 	auto& tileObj = scene.AddEmpty();
@@ -307,40 +316,67 @@ void bt::LevelComponent::AddTileGameObject(const std::string& texturePath, const
 	tileObj.SetLocalScale({ 2, 2, 2 });
 	if (!texturePath.empty())
 		tileObj.AddComponent<kob::ImageRendererComponent>(texturePath);
+	return tileObj;
 }
 void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const
 {
-	std::string spritePath{};
-	if (IsLadderAbove(x, y))
-	{
-		spritePath = GetLadderPlatformPath(x);
-		AddTileGameObject(spritePath, { x,y }, { m_TileSize / 2, m_TileSize / 2 });
-	}
-	else
-	{
-		spritePath = GetPlatformPath(x);
-		AddTileGameObject(spritePath, { x,y }, { m_TileSize / 2, m_TileSize / 2 });
-	}
+	uint32_t col = x;
+	auto tile = m_vTiles[y * m_Cols + col];
 
+	// spawn parent object that'll handle the child ingredients
+	auto& scene = GetGameObject()->GetScene();
+	auto& parentObj = scene.AddEmpty();
+	parentObj.AddComponent<IngredientComponent>();
+	parentObj.tag = "Ingredient";
+	std::vector<kob::GameObject*> vChildren{};
+	vChildren.reserve(6); // pre-reserve 6, since, unless doing something special, ingredient are per 6
+
+	// spawn all ingredient tiles
 	const float pieceSize = m_TileSize / 2;
 	const float pieceOffset = m_TileSize / 4;
-	for (int i{}; i < 2; ++i)
+	while (tile == type && col < m_Cols)
 	{
-		float offsetX = static_cast<float>(i % 2) * pieceSize;
-		float offsetY = pieceSize;
-
-		int subType = GetTileSubType(x, y, type);
-		if (subType == -1 && abs(offsetX) <= FLT_EPSILON)
-			spritePath = basePath + "L.png";
-		else if (subType == 1 && abs(offsetX) >= FLT_EPSILON)
-			spritePath = basePath + "R.png";
-		else if (abs(offsetX) >= FLT_EPSILON)
-			spritePath = basePath + "M1.png";
+		if (IsLadderAbove(col, y))
+			AddTileGameObject(GetLadderPlatformPath(col), { col,y }, { m_TileSize / 2, m_TileSize / 2 });
 		else
-			spritePath = basePath + "M2.png";
+			AddTileGameObject(GetPlatformPath(col), { col,y }, { m_TileSize / 2, m_TileSize / 2 });
 
-		AddTileGameObject(spritePath, { x,y }, { offsetX + pieceOffset, offsetY + pieceOffset });
+		std::string spritePath{};
+		for (int i{}; i < 2; ++i)
+		{
+			const float offsetX = static_cast<float>(i % 2) * pieceSize;
+			const float offsetY = pieceSize;
+
+			int subType = GetTileSubType(col, y, type);
+			if (subType == -1 && abs(offsetX) <= FLT_EPSILON)
+				spritePath = basePath + "L.png";
+			else if (subType == 1 && abs(offsetX) >= FLT_EPSILON)
+				spritePath = basePath + "R.png";
+			else if (abs(offsetX) >= FLT_EPSILON)
+				spritePath = basePath + "M1.png";
+			else
+				spritePath = basePath + "M2.png";
+
+			auto& obj = AddTileGameObject(spritePath, { col,y }, { offsetX + pieceOffset, offsetY + pieceOffset });
+			auto collider = obj.AddComponent<kob::ColliderComponent>();
+			collider->SetSize({ pieceSize / 2.f, pieceSize / 2.f , 1 });
+			obj.AddComponent<IngredientTileComponent>();
+			obj.SetRenderPriority(49);
+			vChildren.push_back(&obj);
+		}
+		++col;
+		tile = m_vTiles[y * m_Cols + col];
 	}
+
+	glm::vec3 pos = glm::vec3(0);
+	for (const auto& c : vChildren)
+		pos += c->GetWorldTransform().GetPosition();
+	pos /= vChildren.size();
+	parentObj.SetLocalPosition(pos);
+	for (const auto& c : vChildren)
+		c->SetParent(&parentObj, true);
+	const auto collider = parentObj.AddComponent<kob::ColliderComponent>();
+	collider->SetSize({ pieceSize * static_cast<int>(parentObj.GetChildCount()), pieceSize, 1.f });
 }
 void bt::LevelComponent::SpawnChef() const
 {
@@ -378,23 +414,40 @@ void bt::LevelComponent::SpawnChef() const
 			            {64, 0, chefTxtSize, chefTxtSize},
 			        }, chefWalkDelay} }
 	        });
-	
+
+	// spawn go
 	auto& scene = GetGameObject()->GetScene();
+
+	// init chef
 	auto& chef = scene.AddEmpty("Player1");
 	chef.SetParent(GetGameObject());
+	chef.SetRenderPriority(48);
+	chef.tag = "Player";
+
+	// add components
 	const auto chefHealth = chef.AddComponent<HealthComponent>(4);
-	chefHealth->OnDamageTaken() += [] { kob::ServiceLocator::GetSoundService().Pause("sound/BGM.wav");
-	kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 0.25f, 0); };
-	auto chefScore = chef.AddComponent<ScoreComponent>();
+	chefHealth->OnDamageTaken() += []
+	{
+		kob::ServiceLocator::GetSoundService().Pause("sound/BGM.wav");
+		kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 0.25f, 0);
+	};
+	const auto chefScore = chef.AddComponent<ScoreComponent>();
 	const auto renderComp = chef.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());
 	const auto animator = chef.AddComponent<kob::Animator>(renderComp, chefSheet);
 	const auto chefMovement = chef.AddComponent<MovementComponent>(speed);
 	chefMovement->SetCurrentLevel(*this);
 	animator->Play("Down", false);
+
+	// set spawn
 	auto chefSpawn = GetChefSpawn();
 	chef.SetLocalPosition({ chefSpawn.x, chefSpawn.y, 0 });
 	chef.SetLocalScale(glm::vec3(2, 2, 2));
 
+	// Add collider
+	auto collider = chef.AddComponent<kob::ColliderComponent>();
+	collider->SetSize({ chefTxtSize * 3.f / 4.f, chefTxtSize, chefTxtSize });
+
+	// input
 	auto& inputManager = kob::InputManager::GetInstance();
 	inputManager.RegisterKeyboardCmd(SDLK_w, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0, -1, 0 }));
 	inputManager.RegisterKeyboardCmd(SDLK_s, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0,  1, 0 }));

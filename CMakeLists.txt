@@ -17,27 +17,29 @@ list(APPEND BURGER_TIME_SOURCES
 	"${SOURCE_DIR}/BurgerTime.cpp"
 
     # Components
-    "${SOURCE_DIR}/Components/GameManagerComponent.cpp" "${SOURCE_DIR}/Components/GameManagerComponent.h"
-    "${SOURCE_DIR}/Components/HealthComponent.cpp"      "${SOURCE_DIR}/Components/HealthComponent.h"
-    "${SOURCE_DIR}/Components/RotateComponent.cpp"      "${SOURCE_DIR}/Components/RotateComponent.h"
-    "${SOURCE_DIR}/Components/ScoreComponent.cpp"       "${SOURCE_DIR}/Components/ScoreComponent.h"
-    "${SOURCE_DIR}/Components/MovementComponent.cpp"    "${SOURCE_DIR}/Components/MovementComponent.h"
-    "${SOURCE_DIR}/Components/LevelComponent.cpp"       "${SOURCE_DIR}/Components/LevelComponent.h"
+    "${SOURCE_DIR}/Components/GameManagerComponent.cpp"     "${SOURCE_DIR}/Components/GameManagerComponent.h"
+    "${SOURCE_DIR}/Components/HealthComponent.cpp"          "${SOURCE_DIR}/Components/HealthComponent.h"
+    "${SOURCE_DIR}/Components/IngredientComponent.cpp"      "${SOURCE_DIR}/Components/IngredientComponent.h"
+    "${SOURCE_DIR}/Components/IngredientTileComponent.cpp"  "${SOURCE_DIR}/Components/IngredientTileComponent.h"
+    "${SOURCE_DIR}/Components/RotateComponent.cpp"          "${SOURCE_DIR}/Components/RotateComponent.h"
+    "${SOURCE_DIR}/Components/ScoreComponent.cpp"           "${SOURCE_DIR}/Components/ScoreComponent.h"
+    "${SOURCE_DIR}/Components/MovementComponent.cpp"        "${SOURCE_DIR}/Components/MovementComponent.h"
+    "${SOURCE_DIR}/Components/LevelComponent.cpp"           "${SOURCE_DIR}/Components/LevelComponent.h"
 
     # Commands
-    "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"     "${SOURCE_DIR}/InputCommands/DamageCommand.h"
-    "${SOURCE_DIR}/InputCommands/MoveCommands.cpp"      "${SOURCE_DIR}/InputCommands/MoveCommands.h"
-    "${SOURCE_DIR}/InputCommands/StateCommands.cpp"     "${SOURCE_DIR}/InputCommands/StateCommands.h"
-    "${SOURCE_DIR}/InputCommands/ScoreCommand.cpp"      "${SOURCE_DIR}/InputCommands/ScoreCommand.h"
+    "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"         "${SOURCE_DIR}/InputCommands/DamageCommand.h"
+    "${SOURCE_DIR}/InputCommands/MoveCommands.cpp"          "${SOURCE_DIR}/InputCommands/MoveCommands.h"
+    "${SOURCE_DIR}/InputCommands/StateCommands.cpp"         "${SOURCE_DIR}/InputCommands/StateCommands.h"
+    "${SOURCE_DIR}/InputCommands/ScoreCommand.cpp"          "${SOURCE_DIR}/InputCommands/ScoreCommand.h"
 
     # Helpers
-    "${SOURCE_DIR}/Helpers/LevelLoader.cpp"             "${SOURCE_DIR}/Helpers/LevelLoader.h"
+    "${SOURCE_DIR}/Helpers/LevelLoader.cpp"                 "${SOURCE_DIR}/Helpers/LevelLoader.h"
 
     # State
     "${SOURCE_DIR}/State/IGameState.h"
-    "${SOURCE_DIR}/State/GamePlayingState.cpp"          "${SOURCE_DIR}/State/GamePlayingState.h"
-    "${SOURCE_DIR}/State/GameMenuState.cpp"             "${SOURCE_DIR}/State/GameMenuState.h"
-    "${SOURCE_DIR}/State/GameLeaderboardState.cpp"      "${SOURCE_DIR}/State/GameLeaderboardState.h"
+    "${SOURCE_DIR}/State/GamePlayingState.cpp"              "${SOURCE_DIR}/State/GamePlayingState.h"
+    "${SOURCE_DIR}/State/GameMenuState.cpp"                 "${SOURCE_DIR}/State/GameMenuState.h"
+    "${SOURCE_DIR}/State/GameLeaderboardState.cpp"          "${SOURCE_DIR}/State/GameLeaderboardState.h"
 )
 
 # Create the executable

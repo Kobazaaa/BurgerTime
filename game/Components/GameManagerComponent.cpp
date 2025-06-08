@@ -25,7 +25,7 @@ void bt::GameManagerComponent::Update()
 	if (!m_pCurrentState)
 		return;
 
-	if (auto pState = m_pCurrentState->Update())
+	if (const auto pState = m_pCurrentState->Update())
 	{
 		m_pCurrentState->OnExit();
 		m_pCurrentState = pState;

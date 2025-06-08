@@ -43,18 +43,15 @@ std::vector<TileType>
 	std::string line;
 	outRows = 0;
 	outCols = 0;
-
 	while (std::getline(inFile, line))
 	{
 		std::stringstream ss(line);
 		std::string cell;
 		uint32_t currentCols = 0;
-
 		while (std::getline(ss, cell, ';'))
 		{
 			if (!tileMap.contains(cell))
 				throw std::runtime_error("Unknown tile type in CSV: " + cell);
-
 			tiles.push_back(tileMap[cell]);
 			++currentCols;
 		}
@@ -63,9 +60,7 @@ std::vector<TileType>
 			outCols = currentCols;
 		else if (currentCols != outCols)
 			throw std::runtime_error("Inconsistent column count in CSV");
-
 		++outRows;
 	}
-
 	return tiles;
 }
