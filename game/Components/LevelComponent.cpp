@@ -1,5 +1,4 @@
 #include "LevelComponent.h"
-
 #include "Animator.h"
 #include "DamageCommand.h"
 #include "HealthComponent.h"
@@ -34,7 +33,6 @@ bt::LevelComponent::LevelComponent(kob::GameObject& parent, const std::filesyste
 		}
 	}
 }
-
 void bt::LevelComponent::SpawnTileMap(float tileSize)
 {
 	m_TileSize = tileSize;
@@ -42,13 +40,11 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 	{
 		for (uint32_t x{}; x < m_Cols; ++x)
 		{
-			std::string spritePath{};
 			switch (m_vTiles[y * m_Cols + x])
 			{
 			case TileType::Platform:
 			{
-				spritePath = GetPlatformPath(x);
-				AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
+				AddPlatformTile(GetPlatformPath(x), { x,y }, true);
 				break;
 			}
 			case TileType::Plate:
@@ -57,8 +53,9 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 				const float pieceOffset = tileSize / 4;
 				for (int i{}; i < 2; ++i)
 				{
-					float offsetX = static_cast<float>(i % 2) * pieceSize;
-					float offsetY = 16.f;
+					const float offsetX = static_cast<float>(i % 2) * pieceSize;
+					const float offsetY = 16.f;
+					std::string spritePath{};
 
 					int subType = GetTileSubType(x, y, TileType::Plate);
 					if (subType == -1 && abs(offsetX) <= FLT_EPSILON)
@@ -68,20 +65,24 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 					else
 						spritePath = "level/tiles/PlateM.png";
 
-					AddTileGameObject(spritePath, { x,y }, { offsetX + pieceOffset, offsetY + pieceOffset });
+					auto& go = AddTileGameObject(spritePath, { x,y }, { offsetX + pieceOffset, offsetY + pieceOffset });
+					go.tag = "Plate";
+					const auto coll = go.AddComponent<kob::ColliderComponent>();
+					coll->SetHalfSize({ m_TileSize / 2, m_TileSize / 8, 1 });
+					coll->offset = { 0, m_TileSize / 3, 1 };
+
 				}
 				break;
 			}
 			case TileType::Ladder:
 			{
-				spritePath = "level/tiles/Ladder.png";
-				AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
+				AddTileGameObject("level/tiles/Ladder.png", { x,y }, { tileSize / 2, tileSize / 2 });
 				break;
 			}
 			case TileType::LadderPlatform:
 			{
-				spritePath = GetLadderPlatformPath(x);
-				AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
+				auto& go = AddTileGameObject(GetLadderPlatformPath(x), { x,y }, { tileSize / 2, tileSize / 2 });
+				go.tag = "Platform";
 				break;
 			}
 			case TileType::BottomBun:
@@ -127,15 +128,9 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 			default:
 			{
 				if (IsLadderAbove(x, y))
-				{
-					spritePath = GetLadderPlatformPath(x);
-					AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
-				}
+					AddPlatformTile(GetLadderPlatformPath(x), { x,y }, true);
 				else
-				{
-					spritePath = GetPlatformPath(x);
-					AddTileGameObject(spritePath, { x,y }, { tileSize / 2, tileSize / 2 });
-				}
+					AddPlatformTile(GetPlatformPath(x), { x,y }, true);
 				break;
 			}
 			}
@@ -307,6 +302,10 @@ std::string bt::LevelComponent::GetLadderPlatformPath(uint32_t x) const
 	return "level/tiles/LadderPlatformDark.png";
 }
 
+
+//--------------------------------------------------
+//    Tile Spawning
+//--------------------------------------------------
 kob::GameObject& bt::LevelComponent::AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const
 {
 	auto& scene = GetGameObject()->GetScene();
@@ -317,6 +316,17 @@ kob::GameObject& bt::LevelComponent::AddTileGameObject(const std::string& textur
 	if (!texturePath.empty())
 		tileObj.AddComponent<kob::ImageRendererComponent>(texturePath);
 	return tileObj;
+}
+void bt::LevelComponent::AddPlatformTile(const std::string& texturePath, const glm::uvec2& xy, bool giveCollider) const
+{
+	auto& go = AddTileGameObject(texturePath, xy, { m_TileSize / 2, m_TileSize / 2 });
+	if (giveCollider)
+	{
+		go.tag = "Platform";
+		auto coll = go.AddComponent<kob::ColliderComponent>();
+		coll->SetHalfSize({ m_TileSize / 2, m_TileSize / 8, 1 });
+		coll->offset = { 0, m_TileSize / 2 + m_TileSize / 8, 1 };
+	}
 }
 void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const
 {
@@ -337,9 +347,9 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 	while (tile == type && col < m_Cols)
 	{
 		if (IsLadderAbove(col, y))
-			AddTileGameObject(GetLadderPlatformPath(col), { col,y }, { m_TileSize / 2, m_TileSize / 2 });
+			AddPlatformTile(GetLadderPlatformPath(col), { col,y }, true);
 		else
-			AddTileGameObject(GetPlatformPath(col), { col,y }, { m_TileSize / 2, m_TileSize / 2 });
+			AddPlatformTile(GetPlatformPath(col), { col,y }, true);
 
 		std::string spritePath{};
 		for (int i{}; i < 2; ++i)
@@ -359,7 +369,7 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 
 			auto& obj = AddTileGameObject(spritePath, { col,y }, { offsetX + pieceOffset, offsetY + pieceOffset });
 			auto collider = obj.AddComponent<kob::ColliderComponent>();
-			collider->SetSize({ pieceSize / 2.f, pieceSize / 2.f , 1 });
+			collider->SetHalfSize({ pieceSize / 2.f, pieceSize / 2.f , 1 });
 			obj.AddComponent<IngredientTileComponent>();
 			obj.SetRenderPriority(49);
 			vChildren.push_back(&obj);
@@ -376,7 +386,7 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 	for (const auto& c : vChildren)
 		c->SetParent(&parentObj, true);
 	const auto collider = parentObj.AddComponent<kob::ColliderComponent>();
-	collider->SetSize({ pieceSize * static_cast<int>(parentObj.GetChildCount()), pieceSize, 1.f });
+	collider->SetHalfSize({ pieceSize * static_cast<int>(parentObj.GetChildCount()), pieceSize, 1.f });
 }
 void bt::LevelComponent::SpawnChef() const
 {
@@ -445,7 +455,7 @@ void bt::LevelComponent::SpawnChef() const
 
 	// Add collider
 	auto collider = chef.AddComponent<kob::ColliderComponent>();
-	collider->SetSize({ chefTxtSize * 3.f / 4.f, chefTxtSize, chefTxtSize });
+	collider->SetHalfSize({ chefTxtSize * 3.f / 4.f, chefTxtSize, chefTxtSize });
 
 	// input
 	auto& inputManager = kob::InputManager::GetInstance();

@@ -26,13 +26,19 @@ namespace bt
 		void OnChildSteppedOn(const IngredientTileComponent& child);
 		void DropChildren(uint32_t idx);
 		void StartFalling();
+		void StopFalling();
+		bool IsOnPlate() const;
 
 	private:
 		// On Tile Interaction
 		int m_WalkedOnChildren = 0;
 		bool m_Falling{ false };
 		float m_FallVelocity{ 0.f };
-		float m_Acceleration{ -100.f };
+		float m_Acceleration{ 100.f };
+		float m_Bounciness{ -40.f };
+
+		// plate
+		bool m_OnPlate = false;
 
 		// Child Tiles
 		float m_ChildDropDistance{ 2.5f };

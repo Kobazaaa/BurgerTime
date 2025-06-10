@@ -31,12 +31,34 @@ void bt::IngredientComponent::Update()
 	{
 		m_FallVelocity += m_Acceleration * kob::Timer::GetDeltaSeconds();
 		auto p = GetGameObject()->GetLocalTransform().GetPosition();
-		GetGameObject()->SetLocalPosition({ p.x, p.y - m_FallVelocity * kob::Timer::GetDeltaSeconds(), p.z});
+		GetGameObject()->SetLocalPosition({ p.x, p.y + m_FallVelocity * kob::Timer::GetDeltaSeconds(), p.z});
 	}
 }
-void bt::IngredientComponent::OnCollisionEnter(kob::GameObject&)
+void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 {
-
+	if (other.CompareTag("Ingredient"))
+	{
+		auto otherIngredient = other.GetComponent<IngredientComponent>();
+		if (otherIngredient->IsOnPlate())
+		{
+			StopFalling();
+			m_OnPlate = true;
+		}
+		else if (otherIngredient->GetGameObject()->GetWorldTransform().GetPosition().y > GetGameObject()->GetWorldTransform().GetPosition().y)
+		{
+			m_FallVelocity = m_Bounciness;
+			otherIngredient->StartFalling();
+		}
+	}
+	else if (other.CompareTag("Platform"))
+	{
+		StopFalling();
+	}
+	else if (other.CompareTag("Plate"))
+	{
+		StopFalling();
+		m_OnPlate = true;
+	}
 }
 
 //--------------------------------------------------
@@ -94,3 +116,12 @@ void bt::IngredientComponent::StartFalling()
 		c->GetGameObject()->SetLocalPosition(newPos);
 	}
 }
+void bt::IngredientComponent::StopFalling()
+{
+	m_WalkedOnChildren = 0;
+	m_FallVelocity = 0.f;
+	m_Falling = false;
+	for (const auto& c : m_vChildTiles)
+		c->ResetCollision();
+}
+bool bt::IngredientComponent::IsOnPlate() const { return m_OnPlate; }

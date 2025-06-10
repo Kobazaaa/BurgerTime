@@ -84,7 +84,11 @@ namespace bt
 		std::string GetPlatformPath(uint32_t x) const;
 		std::string GetLadderPlatformPath(uint32_t x) const;
 
+		//--------------------------------------------------
+		//    Tile Spawning
+		//--------------------------------------------------
 		kob::GameObject& AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const;
+		void AddPlatformTile(const std::string& texturePath, const glm::uvec2& xy, bool giveCollider) const;
 		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const;
 		void SpawnChef() const;
 
