@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Component.h"
+#include "Event.h"
 
 namespace bt
 {
@@ -23,6 +24,8 @@ namespace bt
 		//--------------------------------------------------
 		//    Event Callbacks
 		//--------------------------------------------------
+		kob::Event<> OnPlateReached{};
+
 		void OnChildSteppedOn(const IngredientTileComponent& child);
 		void DropChildren(uint32_t idx);
 		void StartFalling();

@@ -27,11 +27,19 @@ namespace bt
 		//--------------------------------------------------
 		//    Extra
 		//--------------------------------------------------
+		void LoadNextLevel(int id);
+		void OnIngredientCompleted();
 		void EndGame();
 
 	private:
 		kob::EventCallback<> m_EventEndGame{ this, &GamePlayingState::EndGame };
+		kob::EventCallback<> m_EventIngredientComplete{ this, &GamePlayingState::OnIngredientCompleted };
 		kob::GameObject* m_pLevelObject{};
+
+		int m_CompletedIngredientCount{};
+		int m_IngredientCount{};
+		int m_NextLevelID{};
+
 		bool m_EndGame{ false };
 	};
 }

@@ -42,6 +42,8 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 		if (otherIngredient->IsOnPlate())
 		{
 			StopFalling();
+			if (!m_OnPlate)
+				OnPlateReached();
 			m_OnPlate = true;
 		}
 		else if (otherIngredient->GetGameObject()->GetWorldTransform().GetPosition().y > GetGameObject()->GetWorldTransform().GetPosition().y)
@@ -57,6 +59,8 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 	else if (other.CompareTag("Plate"))
 	{
 		StopFalling();
+		if (!m_OnPlate)
+			OnPlateReached();
 		m_OnPlate = true;
 	}
 }
