@@ -487,6 +487,11 @@ void bt::LevelComponent::SpawnChef() const
 
 void bt::LevelComponent::SpawnHotDog(const glm::uvec2& xy) const
 {
+	if (IsLadderAbove(xy.x, xy.y))
+		AddPlatformTile(GetLadderPlatformPath(xy.x), xy, true);
+	else
+		AddPlatformTile(GetPlatformPath(xy.x), xy, true);
+
 	constexpr float hotDogWalkDelay = 0.1f;
 	constexpr float hotDogDeathDelay = 0.1f;
 	constexpr int hotDogTxtSize = 16;
