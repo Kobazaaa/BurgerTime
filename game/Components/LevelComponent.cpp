@@ -478,9 +478,10 @@ void bt::LevelComponent::SpawnChef() const
 void bt::LevelComponent::SpawnHotDog(const glm::uvec2& xy) const
 {
 	constexpr float hotDogWalkDelay = 0.1f;
+	constexpr float hotDogDeathDelay = 0.1f;
 	constexpr int hotDogTxtSize = 16;
 	constexpr float speed = 40.f;
-	auto chefSheet = kob::ResourceManager::GetInstance().LoadSpriteSheet("characters/HotDogSheet.png",
+	auto hotDogSheet = kob::ResourceManager::GetInstance().LoadSpriteSheet("characters/HotDogSheet.png",
 		{
 			{"Down", {
 				{
@@ -501,7 +502,14 @@ void bt::LevelComponent::SpawnHotDog(const glm::uvec2& xy) const
 				{
 					{0, 16, hotDogTxtSize, hotDogTxtSize},
 					{16, 16, hotDogTxtSize, hotDogTxtSize},
-				}, hotDogWalkDelay} }
+				}, hotDogWalkDelay} },
+			{"Squashed", {
+				{
+					{0, 32, hotDogTxtSize, hotDogTxtSize},
+					{16, 32, hotDogTxtSize, hotDogTxtSize},
+					{32, 32, hotDogTxtSize, hotDogTxtSize},
+					{48, 32, hotDogTxtSize, hotDogTxtSize},
+				}, hotDogDeathDelay} }
 		});
 
 	// spawn go
@@ -515,8 +523,8 @@ void bt::LevelComponent::SpawnHotDog(const glm::uvec2& xy) const
 
 	// add components
 	hotDog.AddComponent<EnemyAILogicComponent>();
-	const auto renderComp = hotDog.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());
-	const auto animator = hotDog.AddComponent<kob::Animator>(renderComp, chefSheet);
+	const auto renderComp = hotDog.AddComponent<kob::ImageRendererComponent>(hotDogSheet->GetTexture());
+	const auto animator = hotDog.AddComponent<kob::Animator>(renderComp, hotDogSheet);
 	const auto hotDogMovement = hotDog.AddComponent<MovementComponent>(speed);
 	hotDogMovement->SetCurrentLevel(*this);
 	animator->Play("Down", false);
