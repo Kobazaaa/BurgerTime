@@ -28,6 +28,7 @@ namespace bt
 		//    Accessors & Mutators
 		//--------------------------------------------------
 		void Move(const glm::vec2& direction);
+		glm::vec2 GetDirection() const;
 		void SetSpeed(float speed);
 		void SetCurrentLevel(const LevelComponent& level);
 
@@ -41,6 +42,7 @@ namespace bt
 		// Data
 		float m_Speed{};
 		glm::vec2 m_Dir{};
+		glm::vec2 m_MovementDir{};
 		float m_AlignmentMargin{ 2.f };
 		kob::Animator* m_pAnimator;
 		const LevelComponent* m_pCurrentLevel;

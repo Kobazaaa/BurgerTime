@@ -90,7 +90,11 @@ namespace bt
 		kob::GameObject& AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const;
 		void AddPlatformTile(const std::string& texturePath, const glm::uvec2& xy, bool giveCollider) const;
 		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const;
+
 		void SpawnChef() const;
+		void SpawnHotDog(const glm::uvec2& xy) const;
+		void SpawnEgg(const glm::uvec2& xy) const;
+		void SpawnPickle(const glm::uvec2& xy) const;
 
 		// Data 
 		uint32_t m_Rows{};
@@ -99,5 +103,7 @@ namespace bt
 		float m_TileSize{ 32.f };
 
 		uint32_t m_ChefSpawn{};
+
+		kob::GameObject* m_pPlayer{};
 	};
 }

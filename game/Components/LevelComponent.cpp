@@ -9,6 +9,7 @@
 #include "MoveCommands.h"
 #include "MovementComponent.h"
 #include "ColliderComponent.h"
+#include "EnemyAILogicComponent.h"
 #include "IngredientTileComponent.h"
 #include "IngredientComponent.h"
 #include "ResourceManager.h"
@@ -123,6 +124,11 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 			}
 			case TileType::Empty:
 			{
+				break;
+			}
+			case TileType::SpawnHotDog:
+			{
+				SpawnHotDog({ x,y });
 				break;
 			}
 			default:
@@ -333,7 +339,7 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 	uint32_t col = x;
 	auto tile = m_vTiles[y * m_Cols + col];
 
-	// spawn parent object that'll handle the child ingredients
+	// spawn parent object that will handle the child ingredients
 	auto& scene = GetGameObject()->GetScene();
 	auto& parentObj = scene.AddEmpty();
 	parentObj.AddComponent<IngredientComponent>();
@@ -429,7 +435,7 @@ void bt::LevelComponent::SpawnChef() const
 	auto& scene = GetGameObject()->GetScene();
 
 	// init chef
-	auto& chef = scene.AddEmpty("Player1");
+	auto& chef = scene.AddEmpty("Player");
 	chef.SetParent(GetGameObject());
 	chef.SetRenderPriority(48);
 	chef.tag = "Player";
@@ -467,4 +473,68 @@ void bt::LevelComponent::SpawnChef() const
 	inputManager.RegisterKeyboardCmd(SDLK_c, kob::TriggerState::Pressed, std::make_unique<DamageCommand>(*chefHealth));
 	inputManager.RegisterKeyboardCmd(SDLK_z, kob::TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 10));
 	inputManager.RegisterKeyboardCmd(SDLK_x, kob::TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 100));
+}
+
+void bt::LevelComponent::SpawnHotDog(const glm::uvec2& xy) const
+{
+	constexpr float hotDogWalkDelay = 0.1f;
+	constexpr int hotDogTxtSize = 16;
+	constexpr float speed = 40.f;
+	auto chefSheet = kob::ResourceManager::GetInstance().LoadSpriteSheet("characters/HotDogSheet.png",
+		{
+			{"Down", {
+				{
+					{32, 0, hotDogTxtSize, hotDogTxtSize},
+					{48, 0, hotDogTxtSize, hotDogTxtSize},
+				}, hotDogWalkDelay} },
+			{"Up", {
+				{
+					{32, 16, hotDogTxtSize, hotDogTxtSize},
+					{48, 16, hotDogTxtSize, hotDogTxtSize},
+				}, hotDogWalkDelay} },
+			{"Left", {
+				{
+					{0, 0, hotDogTxtSize, hotDogTxtSize},
+					{16, 0, hotDogTxtSize, hotDogTxtSize},
+				}, hotDogWalkDelay} },
+			{"Right", {
+				{
+					{0, 16, hotDogTxtSize, hotDogTxtSize},
+					{16, 16, hotDogTxtSize, hotDogTxtSize},
+				}, hotDogWalkDelay} }
+		});
+
+	// spawn go
+	auto& scene = GetGameObject()->GetScene();
+
+	// init chef
+	auto& hotDog = scene.AddEmpty("HotDog");
+	hotDog.SetParent(GetGameObject());
+	hotDog.SetRenderPriority(48);
+	hotDog.tag = "Enemy";
+
+	// add components
+	hotDog.AddComponent<EnemyAILogicComponent>();
+	const auto renderComp = hotDog.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());
+	const auto animator = hotDog.AddComponent<kob::Animator>(renderComp, chefSheet);
+	const auto hotDogMovement = hotDog.AddComponent<MovementComponent>(speed);
+	hotDogMovement->SetCurrentLevel(*this);
+	animator->Play("Down", false);
+
+	// set spawn
+	auto chefSpawn = ColRowToCenterPos(xy);
+	hotDog.SetLocalPosition({ chefSpawn.x, chefSpawn.y, 0 });
+	hotDog.SetLocalScale(glm::vec3(2, 2, 2));
+
+	// Add collider
+	auto collider = hotDog.AddComponent<kob::ColliderComponent>();
+	collider->SetHalfSize({ hotDogTxtSize * 3.f / 4.f, hotDogTxtSize, hotDogTxtSize });
+}
+void bt::LevelComponent::SpawnEgg(const glm::uvec2& xy) const
+{
+	xy;
+}
+void bt::LevelComponent::SpawnPickle(const glm::uvec2& xy) const
+{
+	xy;
 }

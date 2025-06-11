@@ -70,6 +70,9 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 //--------------------------------------------------
 void bt::IngredientComponent::OnChildSteppedOn(const IngredientTileComponent& child)
 {
+	if (m_OnPlate)
+		return; // do not do anything if on plate
+
 	if (const auto it = std::ranges::find(m_vChildTiles, &child); it != m_vChildTiles.end())
 	{
 		uint32_t idx = static_cast<uint32_t>(it - m_vChildTiles.begin());

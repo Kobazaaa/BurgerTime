@@ -40,6 +40,9 @@ void bt::MovementComponent::Update()
 		&& !(-m_Dir.x > FLT_EPSILON && CanMoveLeft()))
 		m_Dir.x = 0;
 
+	if (m_Dir.y != 0.f || m_Dir.x != 0.f)
+		m_Dir = normalize(m_Dir);
+
 	const auto currPos = GetGameObject()->GetLocalTransform().GetPosition();
 	const auto newPos = currPos + glm::vec3(m_Dir.x, m_Dir.y, 0) * kob::Timer::GetDeltaSeconds() * m_Speed;
 	GetGameObject()->SetLocalPosition(newPos);
@@ -58,6 +61,7 @@ void bt::MovementComponent::Update()
 			m_pAnimator->Stop(1);
 	}
 
+	m_MovementDir = m_Dir;
 	m_Dir = { 0, 0 };
 }
 
@@ -65,6 +69,7 @@ void bt::MovementComponent::Update()
 //    Accessors & Mutators
 //--------------------------------------------------
 void bt::MovementComponent::Move(const glm::vec2& direction)				{ m_Dir += normalize(direction); }
+glm::vec2 bt::MovementComponent::GetDirection() const						{ return m_MovementDir; }
 void bt::MovementComponent::SetSpeed(float speed)							{ m_Speed = speed; }
 void bt::MovementComponent::SetCurrentLevel(const LevelComponent& level)	{ m_pCurrentLevel = &level; }
 
