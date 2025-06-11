@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.h"
-#include "Event.h"
 
 namespace bt
 {
@@ -20,6 +19,11 @@ namespace bt
 		void Start() override;
 		void Update() override;
 
+		//--------------------------------------------------
+		//    Data
+		//--------------------------------------------------
+		void GetSquashed();
+		bool immobilized = false;
 
 	private:
 		MovementComponent* m_pMovementComponent{};
