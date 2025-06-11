@@ -5,6 +5,7 @@
 #include "IntUIComponent.h"
 #include "Kobengine.h"
 #include "LevelComponent.h"
+#include "HealthUIManager.h"
 #include "IngredientComponent.h"
 #include "ResourceManager.h"
 #include "TextRendererComponent.h"
@@ -75,6 +76,13 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 	tempUI.AddComponent<kob::TextRendererComponent>("lives", fontS);
 	tempUI.AddComponent<kob::IntUIComponent>("Lives:", hp->GetMaxLives(), "", healthChanged);
 	tempUI.SetLocalPosition({ 50, 10, 0 });
+
+	auto& healthUI = scene.AddEmpty("HealthUI");
+	healthUI.SetParent(m_pLevelObject);
+	healthUI.AddComponent<HealthUIManager>(*hp);
+	healthUI.SetLocalPosition({ 8.f, static_cast<float>(kob::Kobengine::GetWindowSize().y) - 12.f, 0 });
+	healthUI.SetLocalScale({ 2, 2, 2 });
+	healthUI.SetRenderPriority(-1);
 
 	// s
 	const auto ingredients = m_pLevelObject->GetScene().GetObjectsByTag("Ingredient");
