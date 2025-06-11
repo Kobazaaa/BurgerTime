@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "IngredientTileComponent.h"
 #include "MovementComponent.h"
+#include "EnemyAILogicComponent.h"
 #include "Timer.h"
 
 //--------------------------------------------------
@@ -63,6 +64,25 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 			OnPlateReached();
 		m_OnPlate = true;
 	}
+
+	if (other.CompareTag("Enemy"))
+	{
+		const auto comp = other.GetComponent<EnemyAILogicComponent>();
+		if (!comp) return;
+		if (!m_Falling &&
+			other.GetWorldTransform().GetPosition().y < GetGameObject()->GetWorldTransform().GetPosition().y)
+			m_vEnemiesOnTop.insert(comp);
+		else if (m_Falling)
+			comp->GetSquashed();
+	}
+	if (const auto comp = other.GetComponent<EnemyAILogicComponent>())
+			m_vEnemiesOnTop.insert(comp);
+}
+void bt::IngredientComponent::OnCollisionExit(kob::GameObject& other)
+{
+	if (other.CompareTag("Enemy"))
+		if (const auto comp = other.GetComponent<EnemyAILogicComponent>())
+			m_vEnemiesOnTop.erase(comp);
 }
 
 //--------------------------------------------------
@@ -122,6 +142,12 @@ void bt::IngredientComponent::StartFalling()
 		newPos.y = 0.f;
 		c->GetGameObject()->SetLocalPosition(newPos);
 	}
+
+	for (auto& enemy : m_vEnemiesOnTop)
+	{
+		enemy->immobilized = true;
+		enemy->GetGameObject()->SetParent(GetGameObject(), true);
+	}
 }
 void bt::IngredientComponent::StopFalling()
 {
@@ -130,5 +156,10 @@ void bt::IngredientComponent::StopFalling()
 	m_Falling = false;
 	for (const auto& c : m_vChildTiles)
 		c->ResetCollision();
+	for (auto& enemy : m_vEnemiesOnTop)
+	{
+		enemy->immobilized = false;
+		enemy->GetGameObject()->SetParent(nullptr, true);
+	}
 }
 bool bt::IngredientComponent::IsOnPlate() const { return m_OnPlate; }
