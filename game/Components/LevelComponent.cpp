@@ -397,6 +397,7 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 void bt::LevelComponent::SpawnChef() const
 {
 	constexpr float chefWalkDelay = 0.1f;
+	constexpr float chefDeathDelay = 0.1f;
 	constexpr int chefTxtSize = 16;
 	constexpr float speed = 50.f;
 	auto chefSheet = kob::ResourceManager::GetInstance().LoadSpriteSheet("characters/ChefSheet.png",
@@ -428,7 +429,16 @@ void bt::LevelComponent::SpawnChef() const
 			            {64, 0, chefTxtSize, chefTxtSize},
 			            {80, 0, chefTxtSize, chefTxtSize},
 			            {64, 0, chefTxtSize, chefTxtSize},
-			        }, chefWalkDelay} }
+			        }, chefWalkDelay} },
+		        {"Death", {
+			        {
+			            {48, 32, chefTxtSize, chefTxtSize},
+			            {64, 32, chefTxtSize, chefTxtSize},
+			            {80, 32, chefTxtSize, chefTxtSize},
+			            {96, 32, chefTxtSize, chefTxtSize},
+			            {112, 32, chefTxtSize, chefTxtSize},
+			            {128, 32, chefTxtSize, chefTxtSize},
+			        }, chefDeathDelay} }
 	        });
 
 	// spawn go
