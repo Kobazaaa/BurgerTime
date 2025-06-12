@@ -42,6 +42,7 @@ namespace bt
 		float m_FallVelocity{ 0.f };
 		float m_Acceleration{ 100.f };
 		float m_Bounciness{ -40.f };
+		bool m_HitPlatformThisFrame{};
 
 		// plate
 		bool m_OnPlate = false;
@@ -51,6 +52,7 @@ namespace bt
 		std::vector<IngredientTileComponent*> m_vChildTiles{};
 
 		// enemies
+		int m_ExtraLevelsToDrop{};
 		std::unordered_set<EnemyAILogicComponent*> m_vEnemiesOnTop{};
 	};
 }

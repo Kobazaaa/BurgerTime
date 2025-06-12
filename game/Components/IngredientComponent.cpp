@@ -28,6 +28,7 @@ void bt::IngredientComponent::Start()
 }
 void bt::IngredientComponent::Update()
 {
+	m_HitPlatformThisFrame = false;
 	if (m_Falling)
 	{
 		m_FallVelocity += m_Acceleration * kob::Timer::GetDeltaSeconds();
@@ -55,7 +56,18 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 	}
 	else if (other.CompareTag("Platform"))
 	{
-		StopFalling();
+		if (!m_HitPlatformThisFrame)
+		{
+			StopFalling();
+			if (m_ExtraLevelsToDrop > 0)
+			{
+				--m_ExtraLevelsToDrop;
+				int temp = m_ExtraLevelsToDrop; // because Start Falling resets m_ExtraLevels
+				StartFalling();
+				m_ExtraLevelsToDrop = temp;
+			}
+			m_HitPlatformThisFrame = true;
+		}
 	}
 	else if (other.CompareTag("Plate"))
 	{
@@ -70,19 +82,20 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 		const auto comp = other.GetComponent<EnemyAILogicComponent>();
 		if (!comp) return;
 		if (!m_Falling &&
-			other.GetWorldTransform().GetPosition().y < GetGameObject()->GetWorldTransform().GetPosition().y)
+			other.GetWorldTransform().GetPosition().y < GetGameObject()->GetWorldTransform().GetPosition().y &&
+			other.GetParent() != GetGameObject())
 			m_vEnemiesOnTop.insert(comp);
 		else if (m_Falling && !comp->immobilized)
 			comp->GetSquashed();
 	}
-	if (const auto comp = other.GetComponent<EnemyAILogicComponent>())
-			m_vEnemiesOnTop.insert(comp);
 }
 void bt::IngredientComponent::OnCollisionExit(kob::GameObject& other)
 {
 	if (other.CompareTag("Enemy"))
+	{
 		if (const auto comp = other.GetComponent<EnemyAILogicComponent>())
 			m_vEnemiesOnTop.erase(comp);
+	}
 }
 
 //--------------------------------------------------
@@ -143,6 +156,7 @@ void bt::IngredientComponent::StartFalling()
 		c->GetGameObject()->SetLocalPosition(newPos);
 	}
 
+	m_ExtraLevelsToDrop = static_cast<int>(m_vEnemiesOnTop.size());
 	for (auto& enemy : m_vEnemiesOnTop)
 	{
 		enemy->immobilized = true;
