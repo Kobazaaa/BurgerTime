@@ -23,9 +23,17 @@ void bt::EnemyAILogicComponent::Update()
 {
 	if (!m_pMovementComponent || immobilized || !m_pPlayer)
 		return;
+
 	const auto& myPos = GetGameObject()->GetWorldTransform().GetPosition();
 	const auto& playerPos = m_pPlayer->GetWorldTransform().GetPosition();
-	const glm::vec2 toPlayer = playerPos - myPos;
+	glm::vec2 toPlayer = playerPos - myPos;
+	auto currDir = m_pMovementComponent->GetDirection();
+
+	if (std::signbit(currDir.y) != std::signbit(toPlayer.y) && abs(currDir.y) > FLT_EPSILON)
+		toPlayer.y = currDir.y;
+	if (std::signbit(currDir.x) != std::signbit(toPlayer.x) && abs(currDir.x) > FLT_EPSILON)
+		toPlayer.x = currDir.x;
+
 	m_pMovementComponent->Move(normalize(toPlayer));
 }
 

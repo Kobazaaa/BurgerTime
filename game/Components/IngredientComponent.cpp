@@ -160,6 +160,10 @@ void bt::IngredientComponent::StopFalling()
 	{
 		enemy->immobilized = false;
 		enemy->GetGameObject()->SetParent(nullptr, true);
+
+		auto pos = enemy->GetGameObject()->GetWorldTransform().GetPosition();
+		pos.y = GetGameObject()->GetWorldTransform().GetPosition().y;
+		enemy->GetGameObject()->SetLocalPosition(pos);
 	}
 }
 bool bt::IngredientComponent::IsOnPlate() const { return m_OnPlate; }

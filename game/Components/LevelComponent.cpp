@@ -122,6 +122,7 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 					AddIngredientTile(TileType::Cheese, "level/tiles/Cheese", x, y);
 				break;
 			}
+			case TileType::HiddenLadder:
 			case TileType::Empty:
 			{
 				break;
@@ -203,19 +204,16 @@ bool bt::LevelComponent::IsAlignedHorizontally(const glm::vec2& pos, float thres
 	return abs(p.x - pos.x) < threshold;
 }
 
-bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row) const
+bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row, bool isEnemy) const
 {
 	if (col >= m_Cols || row >= m_Rows)
 		return false;
 
-	auto tile = m_vTiles[col + row * m_Cols];
-	return tile == TileType::Ladder
+	const auto tile = m_vTiles[col + row * m_Cols];
+	const bool playerAllowed = tile == TileType::Ladder
 		|| tile == TileType::LadderPlatform
-		//|| tile == TileType::HiddenLadder
 
 		|| tile == TileType::Platform
-		//|| tile == TileType::Plate
-		//|| tile == TileType::Empty
 
 		|| tile == TileType::TopBun
 		|| tile == TileType::Tomato
@@ -227,8 +225,13 @@ bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row) const
 		|| tile == TileType::SpawnChef
 		|| tile == TileType::SpawnEgg
 		|| tile == TileType::SpawnHotDog
-		|| tile == TileType::SpawnPickle
-	;
+		|| tile == TileType::SpawnPickle;
+	const bool enemyAllowed = playerAllowed ||
+		tile == TileType::HiddenLadder ||
+		tile == TileType::Plate;
+
+	return isEnemy ? enemyAllowed : playerAllowed;
+
 }
 
 

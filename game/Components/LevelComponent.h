@@ -62,7 +62,7 @@ namespace bt
 		bool IsIngredientTile(TileType tile) const;
 		bool IsAlignedVertically(const glm::vec2& pos, float threshold) const;
 		bool IsAlignedHorizontally(const glm::vec2& pos, float threshold) const;
-		bool CanMoveTo(uint32_t col, uint32_t row) const;
+		bool CanMoveTo(uint32_t col, uint32_t row, bool isEnemy = true) const;
 
 		//--------------------------------------------------
 		//    Accessors & Mutators
