@@ -120,7 +120,8 @@ void bt::GameMenuState::OnEnter()
 		std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->SelectOption(); }), 0);
 
 	im.RegisterKeyboardCmd(
-		SDLK_SPACE, kob::TriggerState::Pressed,
+		SDLK_SPACE,
+		kob::TriggerState::Pressed,
 		std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->SelectOption(); }));
 }
 
