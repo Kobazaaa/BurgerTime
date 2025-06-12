@@ -174,7 +174,7 @@ void bt::IngredientComponent::StopFalling()
 	for (auto& enemy : m_vEnemiesOnTop)
 	{
 		enemy->GetGameObject()->GetComponent<MovementComponent>()->immobilized = false;
-		enemy->GetGameObject()->SetParent(nullptr, true);
+		enemy->GetGameObject()->SetParent(GetGameObject()->GetParent(), true);
 
 		auto pos = enemy->GetGameObject()->GetWorldTransform().GetPosition();
 		pos.y = GetGameObject()->GetWorldTransform().GetPosition().y;

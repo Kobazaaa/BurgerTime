@@ -27,7 +27,7 @@ void bt::EnemyAILogicComponent::Update()
 	const auto& myPos = GetGameObject()->GetWorldTransform().GetPosition();
 	const auto& playerPos = m_pPlayer->GetWorldTransform().GetPosition();
 	glm::vec2 toPlayer = playerPos - myPos;
-	auto currDir = m_pMovementComponent->GetDirection();
+	const auto currDir = m_pMovementComponent->GetDirection();
 
 	if (std::signbit(currDir.y) != std::signbit(toPlayer.y) && abs(currDir.y) > FLT_EPSILON)
 		toPlayer.y = currDir.y;

@@ -354,6 +354,7 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 	// spawn parent object that will handle the child ingredients
 	auto& scene = GetGameObject()->GetScene();
 	auto& parentObj = scene.AddEmpty();
+	parentObj.SetParent(GetGameObject());
 	parentObj.AddComponent<IngredientComponent>();
 	parentObj.tag = "Ingredient";
 	std::vector<kob::GameObject*> vChildren{};
