@@ -1,3 +1,4 @@
+#include <numbers>
 #include "MovementComponent.h"
 #include "Animator.h"
 #include "GameObject.h"
@@ -33,35 +34,45 @@ void bt::MovementComponent::Update()
 	}
 
 
+	auto currPos = GetGameObject()->GetLocalTransform().GetPosition();
+	const auto colRow = m_pCurrentLevel->PosToColRow(currPos);
+	auto snapPos = m_pCurrentLevel->ColRowToCenterPos(colRow);
+
 	if (!(m_Dir.y > FLT_EPSILON && CanMoveDown())
 		&& !(-m_Dir.y > FLT_EPSILON && CanMoveUp()))
+	{
+		if (CanMoveRight() || CanMoveLeft())
+			currPos.y = snapPos.y;
 		m_Dir.y = 0;
+	}
 	if (!(m_Dir.x > FLT_EPSILON && CanMoveRight())
 		&& !(-m_Dir.x > FLT_EPSILON && CanMoveLeft()))
+	{
+		if (CanMoveDown() || CanMoveUp())
+			currPos.x = snapPos.x;
 		m_Dir.x = 0;
+	}
 
 	if (m_Dir.y != 0.f || m_Dir.x != 0.f)
 		m_Dir = normalize(m_Dir);
-
-	const auto currPos = GetGameObject()->GetLocalTransform().GetPosition();
 	const auto newPos = currPos + glm::vec3(m_Dir.x, m_Dir.y, 0) * kob::Timer::GetDeltaSeconds() * m_Speed;
 	GetGameObject()->SetLocalPosition(newPos);
 
+	m_MovementDir = m_Dir;
 	if (m_pAnimator)
 	{
-		if (m_Dir.x < 0)
+		if (m_MovementDir.x < 0)
 			m_pAnimator->Play("Left", true);
-		else if (m_Dir.x > 0)
+		else if (m_MovementDir.x > 0)
 			m_pAnimator->Play("Right", true);
-		else if (m_Dir.y < 0)
+		else if (m_MovementDir.y < 0)
 			m_pAnimator->Play("Up", true);
-		else if (m_Dir.y > 0)
+		else if (m_MovementDir.y > 0)
 			m_pAnimator->Play("Down", true);
 		else
 			m_pAnimator->Stop(1);
 	}
 
-	m_MovementDir = m_Dir;
 	m_Dir = { 0, 0 };
 }
 

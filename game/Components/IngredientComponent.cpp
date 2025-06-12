@@ -72,7 +72,7 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 		if (!m_Falling &&
 			other.GetWorldTransform().GetPosition().y < GetGameObject()->GetWorldTransform().GetPosition().y)
 			m_vEnemiesOnTop.insert(comp);
-		else if (m_Falling)
+		else if (m_Falling && !comp->immobilized)
 			comp->GetSquashed();
 	}
 	if (const auto comp = other.GetComponent<EnemyAILogicComponent>())
