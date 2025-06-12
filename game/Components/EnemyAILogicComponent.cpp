@@ -21,7 +21,7 @@ void bt::EnemyAILogicComponent::Start()
 }
 void bt::EnemyAILogicComponent::Update()
 {
-	if (!m_pMovementComponent || immobilized || !m_pPlayer)
+	if (!m_pMovementComponent || !m_pPlayer)
 		return;
 
 	const auto& myPos = GetGameObject()->GetWorldTransform().GetPosition();
@@ -36,12 +36,11 @@ void bt::EnemyAILogicComponent::Update()
 
 	m_pMovementComponent->Move(normalize(toPlayer));
 }
-
-void bt::EnemyAILogicComponent::GetSquashed()
+void bt::EnemyAILogicComponent::GetSquashed() const
 {
 	if (auto anim = GetGameObject()->GetComponent<kob::Animator>())
 		anim->Play("Squashed", false);
-	immobilized = true;
+	m_pMovementComponent->immobilized = true;
 }
 
 

@@ -22,8 +22,7 @@ namespace bt
 		//--------------------------------------------------
 		//    Data
 		//--------------------------------------------------
-		void GetSquashed();
-		bool immobilized = false;
+		void GetSquashed() const;
 
 	private:
 		MovementComponent* m_pMovementComponent{};

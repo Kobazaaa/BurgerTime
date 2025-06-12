@@ -543,7 +543,7 @@ void bt::LevelComponent::SpawnHotDog(const glm::uvec2& xy) const
 	hotDog.AddComponent<EnemyAILogicComponent>();
 	const auto renderComp = hotDog.AddComponent<kob::ImageRendererComponent>(hotDogSheet->GetTexture());
 	const auto animator = hotDog.AddComponent<kob::Animator>(renderComp, hotDogSheet);
-	const auto hotDogMovement = hotDog.AddComponent<MovementComponent>(speed);
+	const auto hotDogMovement = hotDog.AddComponent<MovementComponent>(speed, true);
 	hotDogMovement->SetCurrentLevel(*this);
 	animator->Play("Down", false);
 

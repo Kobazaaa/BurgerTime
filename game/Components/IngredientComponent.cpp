@@ -80,12 +80,13 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 	if (other.CompareTag("Enemy"))
 	{
 		const auto comp = other.GetComponent<EnemyAILogicComponent>();
+		const auto movementComp = other.GetComponent<MovementComponent>();
 		if (!comp) return;
 		if (!m_Falling &&
 			other.GetWorldTransform().GetPosition().y < GetGameObject()->GetWorldTransform().GetPosition().y &&
-			!comp->immobilized)
+			!movementComp->immobilized)
 			m_vEnemiesOnTop.insert(comp);
-		else if (m_Falling && !comp->immobilized)
+		else if (m_Falling && !movementComp->immobilized)
 			comp->GetSquashed();
 	}
 }
@@ -159,7 +160,7 @@ void bt::IngredientComponent::StartFalling()
 	m_ExtraLevelsToDrop = static_cast<int>(m_vEnemiesOnTop.size());
 	for (auto& enemy : m_vEnemiesOnTop)
 	{
-		enemy->immobilized = true;
+		enemy->GetGameObject()->GetComponent<MovementComponent>()->immobilized = true;
 		enemy->GetGameObject()->SetParent(GetGameObject(), true);
 	}
 }
@@ -172,7 +173,7 @@ void bt::IngredientComponent::StopFalling()
 		c->ResetCollision();
 	for (auto& enemy : m_vEnemiesOnTop)
 	{
-		enemy->immobilized = false;
+		enemy->GetGameObject()->GetComponent<MovementComponent>()->immobilized = false;
 		enemy->GetGameObject()->SetParent(nullptr, true);
 
 		auto pos = enemy->GetGameObject()->GetWorldTransform().GetPosition();

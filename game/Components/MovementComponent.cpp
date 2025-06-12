@@ -9,11 +9,12 @@
 //--------------------------------------------------
 //    Constructor
 //--------------------------------------------------
-bt::MovementComponent::MovementComponent(kob::GameObject& parent, float speed)
+bt::MovementComponent::MovementComponent(kob::GameObject& parent, float speed, bool isEnemy)
 	: Component(parent)
 	, m_Speed(speed)
 	, m_Dir(0.f, 0.f)
 	, m_pAnimator(nullptr)
+	, m_IsEnemy(isEnemy)
 {}
 
 
@@ -26,13 +27,12 @@ void bt::MovementComponent::Start()
 }
 void bt::MovementComponent::Update()
 {
-	if (m_Dir == glm::vec2{ 0, 0 })
+	if (immobilized || m_Dir == glm::vec2{ 0, 0 })
 	{
 		if (m_pAnimator)
 			m_pAnimator->Stop(1);
 		return;
 	}
-
 
 	auto currPos = GetGameObject()->GetLocalTransform().GetPosition();
 	const auto colRow = m_pCurrentLevel->PosToColRow(currPos);
@@ -95,7 +95,7 @@ bool bt::MovementComponent::CanMoveUp() const
 	if (centerPos.y > m_pCurrentLevel->ColRowToCenterPos(colRow).y)
 		return true;
 	return m_pCurrentLevel->IsAlignedHorizontally(centerPos, m_AlignmentMargin)
-		&& m_pCurrentLevel->CanMoveTo(colRow.x, colRow.y - 1);
+		&& m_pCurrentLevel->CanMoveTo(colRow.x, colRow.y - 1, m_IsEnemy);
 }
 
 bool bt::MovementComponent::CanMoveDown() const
@@ -105,7 +105,7 @@ bool bt::MovementComponent::CanMoveDown() const
 	if (centerPos.y < m_pCurrentLevel->ColRowToCenterPos(colRow).y)
 		return true;
 	return m_pCurrentLevel->IsAlignedHorizontally(centerPos, m_AlignmentMargin)
-		&& m_pCurrentLevel->CanMoveTo(colRow.x, colRow.y + 1);
+		&& m_pCurrentLevel->CanMoveTo(colRow.x, colRow.y + 1, m_IsEnemy);
 }
 
 bool bt::MovementComponent::CanMoveLeft() const
@@ -115,7 +115,7 @@ bool bt::MovementComponent::CanMoveLeft() const
 	if (centerPos.x > m_pCurrentLevel->ColRowToCenterPos(colRow).x)
 		return true;
 	return m_pCurrentLevel->IsAlignedVertically(centerPos, m_AlignmentMargin)
-		&& m_pCurrentLevel->CanMoveTo(colRow.x - 1, colRow.y);
+		&& m_pCurrentLevel->CanMoveTo(colRow.x - 1, colRow.y, m_IsEnemy);
 }
 
 bool bt::MovementComponent::CanMoveRight() const
@@ -125,5 +125,5 @@ bool bt::MovementComponent::CanMoveRight() const
 	if (centerPos.x < m_pCurrentLevel->ColRowToCenterPos(colRow).x)
 		return true;
 	return m_pCurrentLevel->IsAlignedVertically(centerPos, m_AlignmentMargin)
-		&& m_pCurrentLevel->CanMoveTo(colRow.x + 1, colRow.y);
+		&& m_pCurrentLevel->CanMoveTo(colRow.x + 1, colRow.y, m_IsEnemy);
 }

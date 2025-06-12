@@ -16,7 +16,7 @@ namespace bt
 		//--------------------------------------------------
 		//    Constructor
 		//--------------------------------------------------
-		explicit MovementComponent(kob::GameObject& parent, float speed);
+		explicit MovementComponent(kob::GameObject& parent, float speed, bool isEnemy = false);
 
 		//--------------------------------------------------
 		//    Loop
@@ -31,6 +31,7 @@ namespace bt
 		glm::vec2 GetDirection() const;
 		void SetSpeed(float speed);
 		void SetCurrentLevel(const LevelComponent& level);
+		bool immobilized = false;
 
 	private:
 		// Functions
@@ -40,6 +41,7 @@ namespace bt
 		bool CanMoveRight() const;
 
 		// Data
+		bool m_IsEnemy{ false };
 		float m_Speed{};
 		glm::vec2 m_Dir{};
 		glm::vec2 m_MovementDir{};
