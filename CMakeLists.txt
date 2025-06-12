@@ -27,6 +27,7 @@ list(APPEND BURGER_TIME_SOURCES
     "${SOURCE_DIR}/Components/LevelComponent.cpp"           "${SOURCE_DIR}/Components/LevelComponent.h"
     "${SOURCE_DIR}/Components/HealthUIManager.cpp"          "${SOURCE_DIR}/Components/HealthUIManager.h"
     "${SOURCE_DIR}/Components/EnemyAILogicComponent.cpp"    "${SOURCE_DIR}/Components/EnemyAILogicComponent.h"
+    "${SOURCE_DIR}/Components/MenuComponent.cpp"            "${SOURCE_DIR}/Components/MenuComponent.h"
 
     # Commands
     "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"         "${SOURCE_DIR}/InputCommands/DamageCommand.h"

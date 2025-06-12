@@ -8,6 +8,7 @@ namespace kob
 
 namespace bt
 {
+	class MenuComponent;
 	class GameMenuState final : public IGameState
 	{
 	public:
@@ -26,10 +27,16 @@ namespace bt
 		//--------------------------------------------------
 		//    Extra
 		//--------------------------------------------------
+		void ToggleInfoMenu() const;
+		void EnterSinglePlayerMode();
+		void EnterVersusMode();
+		void EnterCoOpMode();
 		void GoToPlayMode();
 
 	private:
 		kob::GameObject* m_pMenuObject{};
+		kob::GameObject* m_pInfoObject{};
+		MenuComponent* m_pMenuComponent{};
 		bool m_GoToPlayMode{ false };
 	};
 }
