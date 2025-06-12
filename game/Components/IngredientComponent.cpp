@@ -62,7 +62,7 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 			if (m_ExtraLevelsToDrop > 0)
 			{
 				--m_ExtraLevelsToDrop;
-				int temp = m_ExtraLevelsToDrop; // because Start Falling resets m_ExtraLevels
+				const int temp = m_ExtraLevelsToDrop; // because Start Falling resets m_ExtraLevels
 				StartFalling();
 				m_ExtraLevelsToDrop = temp;
 			}
@@ -83,7 +83,7 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 		if (!comp) return;
 		if (!m_Falling &&
 			other.GetWorldTransform().GetPosition().y < GetGameObject()->GetWorldTransform().GetPosition().y &&
-			other.GetParent() != GetGameObject())
+			!comp->immobilized)
 			m_vEnemiesOnTop.insert(comp);
 		else if (m_Falling && !comp->immobilized)
 			comp->GetSquashed();
@@ -177,7 +177,7 @@ void bt::IngredientComponent::StopFalling()
 
 		auto pos = enemy->GetGameObject()->GetWorldTransform().GetPosition();
 		pos.y = GetGameObject()->GetWorldTransform().GetPosition().y;
-		enemy->GetGameObject()->SetLocalPosition(pos);
+		//enemy->GetGameObject()->SetLocalPosition(pos);
 	}
 }
 bool bt::IngredientComponent::IsOnPlate() const { return m_OnPlate; }
