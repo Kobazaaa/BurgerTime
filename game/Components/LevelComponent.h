@@ -92,9 +92,7 @@ namespace bt
 		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const;
 
 		void SpawnChef() const;
-		void SpawnHotDog(const glm::uvec2& xy) const;
-		void SpawnEgg(const glm::uvec2& xy) const;
-		void SpawnPickle(const glm::uvec2& xy) const;
+		void SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const;
 
 		// Data 
 		uint32_t m_Rows{};
