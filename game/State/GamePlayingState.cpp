@@ -120,12 +120,14 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 	levelComp->SpawnTileMap();
 
 	// Debug Grid
+#ifdef _DEBUG
 	auto ws = kob::Kobengine::GetWindowSize();
 	auto colRow = levelComp->GetColRow();
 	auto& grid = scene.AddEmpty("Debug Grid");
 	grid.SetRenderPriority(0);
 	grid.SetParent(m_pLevelObject);
 	grid.AddComponent<kob::GridRendererComponent>(glm::vec2{ ws.x, ws.y }, colRow.y, colRow.x);
+#endif
 
 	// Hook Up Ingredients
 	const auto ingredients = m_pLevelObject->GetScene().GetObjectsByTag("Ingredient");

@@ -14,11 +14,11 @@ bt::IngredientTileComponent::IngredientTileComponent(kob::GameObject& parent)
 //    Loop
 //--------------------------------------------------
 void bt::IngredientTileComponent::Update() {}
-void bt::IngredientTileComponent::OnCollisionEnter(kob::GameObject& other)
+void bt::IngredientTileComponent::OnCollisionStay(kob::GameObject& other)
 {
-	if (!m_HasBeenSteppedOn && other.CompareTag("Player"))
+	if (!m_HasBeenSteppedOn && other.CompareTag("Player") &&
+		other.GetWorldTransform().GetPosition().y < GetGameObject()->GetWorldTransform().GetPosition().y)
 	{
-		//other.GetComponent<MovementComponent>().
 		m_HasBeenSteppedOn = true;
 		WasSteppedOnEvent(*this);
 	}
