@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Event.h"
 #include "vec2.hpp"
 
 namespace bt
@@ -18,6 +19,8 @@ namespace bt
 		void Update() override;
 		void ThrowPepper(const glm::vec2& dir, float dst);
 		void AddPepper();
+		int GetPepper() const;
+		kob::Event<int> OnPepperChange{};
 
 	private:
 		int m_Pepper{};

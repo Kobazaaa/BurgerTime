@@ -59,6 +59,8 @@ void bt::ThrowPepperComponent::ThrowPepper(const glm::vec2& dir, float dst)
 
 	m_Pepper--;
 	m_Pepper = std::max(m_Pepper, 0);
+	OnPepperChange(m_Pepper);
 }
-void bt::ThrowPepperComponent::AddPepper() { ++m_Pepper; }
+void bt::ThrowPepperComponent::AddPepper() { ++m_Pepper; OnPepperChange(m_Pepper); }
+int bt::ThrowPepperComponent::GetPepper() const { return m_Pepper; }
 
