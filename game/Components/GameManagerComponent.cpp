@@ -40,7 +40,3 @@ void bt::GameManagerComponent::Update()
 bt::GameMenuState* bt::GameManagerComponent::MenuState()				const { return m_pGameMenuState.get(); }
 bt::GamePlayingState* bt::GameManagerComponent::PlayState()				const { return m_pGamePlayingState.get(); }
 bt::GameLeaderboardState* bt::GameManagerComponent::LeaderboardState()	const { return m_pGameLeaderboardState.get(); }
-
-//--------------------------------------------------
-//    Events
-//--------------------------------------------------

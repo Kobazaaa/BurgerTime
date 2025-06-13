@@ -17,7 +17,7 @@ namespace bt
 		//    Loop
 		//--------------------------------------------------
 		void Update() override;
-
+		void OnCollisionEnter(kob::GameObject& other) override;
 
 		//--------------------------------------------------
 		//    Health

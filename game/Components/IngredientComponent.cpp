@@ -44,7 +44,7 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 		auto otherIngredient = other.GetComponent<IngredientComponent>();
 		if (otherIngredient->IsOnPlate())
 		{
-			StopFalling();
+			StopFalling(true);
 			if (!m_OnPlate)
 				OnPlateReached();
 			m_OnPlate = true;
@@ -59,7 +59,7 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 	{
 		if (!m_HitPlatformThisFrame)
 		{
-			StopFalling();
+			StopFalling(true);
 			if (m_ExtraLevelsToDrop > 0)
 			{
 				--m_ExtraLevelsToDrop;
@@ -72,7 +72,7 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 	}
 	else if (other.CompareTag("Plate"))
 	{
-		StopFalling();
+		StopFalling(true);
 		if (!m_OnPlate)
 			OnPlateReached();
 		m_OnPlate = true;
@@ -87,7 +87,8 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 			other.GetWorldTransform().GetPosition().y < GetGameObject()->GetWorldTransform().GetPosition().y &&
 			!movementComp->IsImmobile())
 			m_vEnemiesOnTop.insert(comp);
-		else if (m_Falling)
+		else if (m_Falling && other.GetWorldTransform().GetPosition().y > GetGameObject()->GetWorldTransform().GetPosition().y &&
+			other.GetParent() == GetGameObject()->GetParent())
 		{
 			if (const auto squash = other.GetComponent<SquashableComponent>())
 				squash->Squash();
@@ -166,27 +167,25 @@ void bt::IngredientComponent::StartFalling()
 	for (auto& enemy : m_vEnemiesOnTop)
 	{
 		const auto squash = enemy->GetGameObject()->GetComponent<SquashableComponent>();
-		if (squash->IsSquashed()) continue;
-
+		if (squash && squash->IsSquashed()) continue;
 		enemy->GetGameObject()->GetComponent<MovementComponent>()->Immobilize();
 		enemy->GetGameObject()->SetParent(GetGameObject(), true);
 	}
 }
-void bt::IngredientComponent::StopFalling()
+void bt::IngredientComponent::StopFalling(bool unParent)
 {
 	m_WalkedOnChildren = 0;
 	m_FallVelocity = 0.f;
 	m_Falling = false;
 	for (const auto& c : m_vChildTiles)
 		c->ResetCollision();
+
+	if (!unParent)
+		return;
 	for (auto& enemy : m_vEnemiesOnTop)
 	{
 		enemy->GetGameObject()->GetComponent<MovementComponent>()->Mobilize();
 		enemy->GetGameObject()->SetParent(GetGameObject()->GetParent(), true);
-
-		auto pos = enemy->GetGameObject()->GetWorldTransform().GetPosition();
-		pos.y = GetGameObject()->GetWorldTransform().GetPosition().y;
-		//enemy->GetGameObject()->SetLocalPosition(pos);
 	}
 }
 bool bt::IngredientComponent::IsOnPlate() const { return m_OnPlate; }

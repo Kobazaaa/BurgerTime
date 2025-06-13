@@ -32,7 +32,7 @@ namespace bt
 		void OnChildSteppedOn(const IngredientTileComponent& child);
 		void DropChildren(uint32_t idx);
 		void StartFalling();
-		void StopFalling();
+		void StopFalling(bool unParent);
 		bool IsOnPlate() const;
 
 	private:
@@ -41,7 +41,7 @@ namespace bt
 		bool m_Falling{ false };
 		float m_FallVelocity{ 0.f };
 		float m_Acceleration{ 100.f };
-		float m_Bounciness{ -40.f };
+		float m_Bounciness{ -20.f };
 		bool m_HitPlatformThisFrame{};
 
 		// plate

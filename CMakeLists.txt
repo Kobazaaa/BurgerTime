@@ -37,7 +37,6 @@ list(APPEND BURGER_TIME_SOURCES
     # Commands
     "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"         "${SOURCE_DIR}/InputCommands/DamageCommand.h"
     "${SOURCE_DIR}/InputCommands/PlayingCommands.cpp"       "${SOURCE_DIR}/InputCommands/PlayingCommands.h"
-    "${SOURCE_DIR}/InputCommands/StateCommands.cpp"         "${SOURCE_DIR}/InputCommands/StateCommands.h"
     "${SOURCE_DIR}/InputCommands/ScoreCommand.cpp"          "${SOURCE_DIR}/InputCommands/ScoreCommand.h"
 
     # Helpers

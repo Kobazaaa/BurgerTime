@@ -8,6 +8,10 @@
 
 namespace bt
 {
+	enum class GameMode
+	{
+		Solo, Versus, CoOp
+	};
 	class GameManagerComponent final : public kob::Component
 	{
 	public:
@@ -28,10 +32,7 @@ namespace bt
 		GameMenuState* MenuState() const;
 		GamePlayingState* PlayState() const;
 		GameLeaderboardState* LeaderboardState() const;
-
-		//--------------------------------------------------
-		//    Event
-		//--------------------------------------------------
+		GameMode gameMode{};
 
 	private:
 		IGameState* m_pCurrentState{};
@@ -39,5 +40,6 @@ namespace bt
 		std::unique_ptr<GameMenuState> m_pGameMenuState{};
 		std::unique_ptr<GamePlayingState> m_pGamePlayingState{};
 		std::unique_ptr<GameLeaderboardState> m_pGameLeaderboardState{};
+
 	};
 }

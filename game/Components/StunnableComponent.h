@@ -28,6 +28,7 @@ namespace bt
 	private:
 		float m_StunTime = 0.f;
 		bool m_IsStunned = false;
+		bool m_WasImmobileOnStun = false;
 		MovementComponent* m_pMovementComponent{};
 	};
 }

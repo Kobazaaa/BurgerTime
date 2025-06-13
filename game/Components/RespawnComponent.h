@@ -17,11 +17,12 @@ namespace bt
 		//    Loop
 		//--------------------------------------------------
 		void Update() override;
-		kob::EventCallback<> Respawn{ kob::EventCallback<>(this, &RespawnComponent::RespawnInternal) };
+		void RespawnDelayed();
+		void ImmediateRespawn();
+		kob::EventCallback<> RespawnDelayCallback{ kob::EventCallback<>(this, &RespawnComponent::RespawnDelayed) };
 		kob::Event<> OnRespawn{};
 
 	private:
-		void RespawnInternal();
 		float m_RespawnDelay;
 		float m_Timer{};
 		glm::vec2 m_SpawnPosition;

@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include "Component.h"
 
 namespace bt
@@ -20,6 +22,6 @@ namespace bt
 
 	private:
 		MovementComponent* m_pMovementComponent{};
-		kob::GameObject* m_pPlayer{};
+		std::vector<kob::GameObject*> m_vPlayers{};
 	};
 }

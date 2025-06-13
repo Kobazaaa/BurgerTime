@@ -14,6 +14,7 @@ namespace bt
 		//--------------------------------------------------
 		explicit LevelComponent(kob::GameObject& parent, const std::filesystem::path& levelPath);
 		void SpawnTileMap(float tileSize = 32.f);
+		kob::GameObject* SpawnChef(const std::string& name, const std::string& sheetPath) const;
 
 		//--------------------------------------------------
 		//    Loop
@@ -91,8 +92,7 @@ namespace bt
 		void AddPlatformTile(const std::string& texturePath, const glm::uvec2& xy, bool giveCollider) const;
 		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const;
 
-		void SpawnChef() const;
-		void SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const;
+		kob::GameObject* SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const;
 
 		// Data 
 		uint32_t m_Rows{};

@@ -18,17 +18,16 @@ bt::RespawnComponent::RespawnComponent(kob::GameObject& parent, float respawnDel
 //--------------------------------------------------
 void bt::RespawnComponent::Update()
 {
-	if (m_Timer <= 0)
+	if (m_Timer < 0)
 		return;
 
 	m_Timer -= kob::Timer::GetDeltaSeconds();
 	if (m_Timer <= 0.f)
-	{
-		GetGameObject()->SetLocalPosition({ m_SpawnPosition , 0.f });
-		OnRespawn();
-	}
+		ImmediateRespawn();
 }
-void bt::RespawnComponent::RespawnInternal()
+void bt::RespawnComponent::RespawnDelayed() { m_Timer = m_RespawnDelay; }
+void bt::RespawnComponent::ImmediateRespawn()
 {
-	m_Timer = m_RespawnDelay;
+	GetGameObject()->SetLocalPosition({ m_SpawnPosition , 0.f });
+	OnRespawn();
 }

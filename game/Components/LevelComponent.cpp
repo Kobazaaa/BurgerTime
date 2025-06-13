@@ -155,7 +155,6 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 			}
 		}
 	}
-	SpawnChef();
 }
 
 
@@ -406,13 +405,13 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 	const auto collider = parentObj.AddComponent<kob::ColliderComponent>();
 	collider->SetHalfSize({ pieceSize * static_cast<int>(parentObj.GetChildCount()), pieceSize, 1.f });
 }
-void bt::LevelComponent::SpawnChef() const
+kob::GameObject* bt::LevelComponent::SpawnChef(const std::string& name, const std::string& sheetPath) const
 {
 	constexpr float chefWalkDelay = 0.1f;
-	constexpr float chefDeathDelay = 0.1f;
+	constexpr float chefDeathDelay = 0.2f;
 	constexpr int chefTxtSize = 16;
 	constexpr float speed = 50.f;
-	auto chefSheet = kob::ResourceManager::GetInstance().LoadSpriteSheet("characters/ChefSheet.png",
+	auto chefSheet = kob::ResourceManager::GetInstance().LoadSpriteSheet(sheetPath,
 	        {
 		        {"Down", {
 			        {
@@ -457,7 +456,7 @@ void bt::LevelComponent::SpawnChef() const
 	auto& scene = GetGameObject()->GetScene();
 
 	// init chef
-	auto& chef = scene.AddEmpty("Player");
+	auto& chef = scene.AddEmpty(name);
 	chef.SetParent(GetGameObject());
 	chef.SetRenderPriority(48);
 	chef.tag = "Player";
@@ -469,7 +468,7 @@ void bt::LevelComponent::SpawnChef() const
 		kob::ServiceLocator::GetSoundService().Pause("sound/BGM.wav");
 		kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 0.25f, 0);
 	};
-	const auto chefScore = chef.AddComponent<ScoreComponent>();
+	chef.AddComponent<ScoreComponent>();
 	const auto renderComp = chef.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());
 	const auto animator = chef.AddComponent<kob::Animator>(renderComp, chefSheet);
 	const auto chefMovement = chef.AddComponent<MovementComponent>(speed);
@@ -486,21 +485,11 @@ void bt::LevelComponent::SpawnChef() const
 	collider->SetHalfSize({ chefTxtSize * 3.f / 4.f, chefTxtSize, chefTxtSize });
 
 	// pepper
-	auto chefPepper = chef.AddComponent<ThrowPepperComponent>(5);
+	chef.AddComponent<ThrowPepperComponent>(5);
 
-	// input
-	auto& inputManager = kob::InputManager::GetInstance();
-	inputManager.RegisterKeyboardCmd(SDLK_w, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0, -1, 0 }));
-	inputManager.RegisterKeyboardCmd(SDLK_s, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0,  1, 0 }));
-	inputManager.RegisterKeyboardCmd(SDLK_d, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 1,  0, 0 }));
-	inputManager.RegisterKeyboardCmd(SDLK_a, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ -1,  0, 0 }));
-	inputManager.RegisterKeyboardCmd(SDLK_SPACE, kob::TriggerState::Pressed, std::make_unique<ThrowPepperCommand>(*chefMovement, *chefPepper, m_TileSize));
-
-	inputManager.RegisterKeyboardCmd(SDLK_c, kob::TriggerState::Pressed, std::make_unique<DamageCommand>(*chefHealth));
-	inputManager.RegisterKeyboardCmd(SDLK_z, kob::TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 10));
-	inputManager.RegisterKeyboardCmd(SDLK_x, kob::TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 100));
+	return &chef;
 }
-void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const
+kob::GameObject* bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const
 {
 	constexpr float walkDelay = 0.1f;
 	constexpr float deathDelay = 0.1f;
@@ -567,7 +556,7 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 	enemy.SetLocalPosition({ spawn.x, spawn.y, 0 });
 	enemy.SetLocalScale(glm::vec3(2, 2, 2));
 	auto respawnComponent = enemy.AddComponent<RespawnComponent>(1.f, spawn);
-	squashComponent->OnSquashed += &respawnComponent->Respawn;
+	squashComponent->OnSquashed += &respawnComponent->RespawnDelayCallback;
 	respawnComponent->OnRespawn += &squashComponent->ResetCallback;
 
 	// Add collider
@@ -582,4 +571,6 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 	const auto black = cover.AddComponent<kob::ImageRendererComponent>("level/tiles/black.png");
 	const auto bSize = black->GetSize();
 	cover.SetLocalScale(glm::vec3(m_TileSize / bSize.x, m_TileSize / bSize.y, 1));
+
+	return &enemy;
 }

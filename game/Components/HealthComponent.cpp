@@ -1,6 +1,9 @@
 #include "HealthComponent.h"
 #include <algorithm>
 
+#include "GameObject.h"
+#include "MovementComponent.h"
+
 
 //--------------------------------------------------
 //    Constructor
@@ -16,6 +19,15 @@ bt::HealthComponent::HealthComponent(kob::GameObject& parent, int maxLives)
 //    Loop
 //--------------------------------------------------
 void bt::HealthComponent::Update() {}
+void bt::HealthComponent::OnCollisionEnter(kob::GameObject& other)
+{
+	if (other.CompareTag("Enemy"))
+	{
+		auto comp = other.GetComponent<MovementComponent>();
+		if (comp && !comp->IsImmobile())
+			Damage();
+	}
+}
 
 //--------------------------------------------------
 //    Health

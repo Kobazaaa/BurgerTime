@@ -7,7 +7,6 @@
 #include "ResourceManager.h"
 #include "ServiceLocator.h"
 #include "TextRendererComponent.h"
-#include "StateCommands.h"
 #include "MenuComponent.h"
 
 //--------------------------------------------------
@@ -88,10 +87,8 @@ bt::GameMenuState::GameMenuState(GameManagerComponent& gameManagerComp)
 //--------------------------------------------------
 bt::IGameState* bt::GameMenuState::Update()
 {
-	if (m_GoToPlayMode)
-	{
+	if (m_ExitMenu)
 		return GetGameManager()->PlayState();
-	}
 	return nullptr;
 }
 
@@ -100,7 +97,8 @@ void bt::GameMenuState::OnEnter()
 	//kob::ServiceLocator::GetSoundService().Play("sound/BGM.wav", 0.25f, -1);
 
 	m_pMenuObject->SetActive(true);
-	m_GoToPlayMode = false;
+	m_pInfoObject->SetActive(false);
+	m_ExitMenu = false;
 
 	auto& im = kob::InputManager::GetInstance();
 	im.RegisterGamepad();
@@ -128,7 +126,8 @@ void bt::GameMenuState::OnEnter()
 void bt::GameMenuState::OnExit()
 {
 	m_pMenuObject->SetActive(false);
-	m_GoToPlayMode = true;
+	m_pInfoObject->SetActive(false);
+	m_ExitMenu = true;
 
 	// Unregister input
 	kob::InputManager::GetInstance().UnregisterGamepadBtn(kob::Gamepad::Button::X, 0);
@@ -153,20 +152,19 @@ void bt::GameMenuState::ToggleInfoMenu() const
 }
 void bt::GameMenuState::EnterSinglePlayerMode()
 {
-	GoToPlayMode();
+	m_ExitMenu = true;
+	GetGameManager()->gameMode = GameMode::Solo;
 	std::cout << "Enter Single Player\n";
 }
 void bt::GameMenuState::EnterVersusMode()
 {
-	GoToPlayMode();
+	m_ExitMenu = true;
+	GetGameManager()->gameMode = GameMode::Versus;
 	std::cout << "Enter Versus Mode\n";
 }
 void bt::GameMenuState::EnterCoOpMode()
 {
-	GoToPlayMode();
+	m_ExitMenu = true;
+	GetGameManager()->gameMode = GameMode::CoOp;
 	std::cout << "Enter Co-Op Mode\n";
-}
-void bt::GameMenuState::GoToPlayMode()
-{
-	m_GoToPlayMode = true;
 }
