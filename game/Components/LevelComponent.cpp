@@ -26,7 +26,6 @@ bt::LevelComponent::LevelComponent(kob::GameObject& parent, const std::filesyste
 	: Component(parent)
 {
 	m_vTiles = LevelLoader::LoadCSV(levelPath, m_Rows, m_Cols);
-
 	for (uint32_t i{}; i < m_vTiles.size(); ++i)
 	{
 		if (m_vTiles[i] == TileType::SpawnChef)
@@ -234,10 +233,7 @@ bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row, bool isEnemy) con
 		|| tile == TileType::Burger
 		|| tile == TileType::BottomBun
 
-		|| tile == TileType::SpawnChef
-		|| tile == TileType::SpawnEgg
-		|| tile == TileType::SpawnHotDog
-		|| tile == TileType::SpawnPickle;
+		|| tile == TileType::SpawnChef;
 	const bool enemyAllowed = playerAllowed ||
 		tile == TileType::HiddenLadder ||
 		tile == TileType::Plate;
@@ -505,11 +501,6 @@ void bt::LevelComponent::SpawnChef() const
 }
 void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const
 {
-	if (IsLadderAbove(xy.x, xy.y))
-		AddPlatformTile(GetLadderPlatformPath(xy.x), xy, true);
-	else
-		AddPlatformTile(GetPlatformPath(xy.x), xy, true);
-
 	constexpr float walkDelay = 0.1f;
 	constexpr float deathDelay = 0.1f;
 	constexpr float stunDelay = 0.25f;
@@ -578,4 +569,13 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 	// Add collider
 	auto collider = enemy.AddComponent<kob::ColliderComponent>();
 	collider->SetHalfSize({ txtSize * 3.f / 4.f, txtSize, txtSize });
+
+	// cover up
+	auto& cover = scene.AddEmpty("Cover");
+	cover.SetParent(GetGameObject());
+	cover.SetRenderPriority(47);
+	cover.SetLocalPosition({ spawn.x, spawn.y, 0 });
+	const auto black = cover.AddComponent<kob::ImageRendererComponent>("level/tiles/black.png");
+	const auto bSize = black->GetSize();
+	cover.SetLocalScale(glm::vec3(m_TileSize / bSize.x, m_TileSize / bSize.y, 1));
 }

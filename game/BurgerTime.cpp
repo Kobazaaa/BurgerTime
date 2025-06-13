@@ -42,7 +42,7 @@ void kob::Kobengine::Setup()
 	//  General
 	constexpr float TILE_SIZE = 32.f;
 	constexpr uint32_t ROWS = 13;
-	constexpr uint32_t COLS = 17;
+	constexpr uint32_t COLS = 19;
 	constexpr float WINDOW_WIDTH  = COLS * TILE_SIZE;
 	constexpr float WINDOW_HEIGHT = ROWS * TILE_SIZE;
 

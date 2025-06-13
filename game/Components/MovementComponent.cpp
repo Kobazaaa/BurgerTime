@@ -63,14 +63,10 @@ void bt::MovementComponent::Update()
 	m_MovementDir = m_Dir;
 	if (m_pAnimator)
 	{
-		if (m_MovementDir.y < 0)
-			m_pAnimator->Play("Up", true);
-		else if (m_MovementDir.y > 0)
-			m_pAnimator->Play("Down", true);
-		else if (m_MovementDir.x < 0)
-			m_pAnimator->Play("Left", true);
-		else if (m_MovementDir.x > 0)
-			m_pAnimator->Play("Right", true);
+		if (abs(m_MovementDir.y) > abs(m_MovementDir.x))
+			m_pAnimator->Play(m_MovementDir.y < 0 ? "Up" : "Down", true);
+		else if (abs(m_MovementDir.y) < abs(m_MovementDir.x))
+			m_pAnimator->Play(m_MovementDir.x < 0 ? "Left" : "Right", true);
 		else
 			m_pAnimator->Stop(1);
 	}
