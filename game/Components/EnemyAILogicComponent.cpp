@@ -36,11 +36,3 @@ void bt::EnemyAILogicComponent::Update()
 
 	m_pMovementComponent->Move(normalize(toPlayer));
 }
-void bt::EnemyAILogicComponent::GetSquashed() const
-{
-	if (auto anim = GetGameObject()->GetComponent<kob::Animator>())
-		anim->Play("Squashed", false);
-	m_pMovementComponent->immobilized = true;
-}
-
-

@@ -16,6 +16,7 @@
 #include "ScoreCommand.h"
 #include "ScoreComponent.h"
 #include "ServiceLocator.h"
+#include "SquashableComponent.h"
 
 //--------------------------------------------------
 //    Constructor
@@ -550,6 +551,7 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 
 	// add components
 	enemy.AddComponent<EnemyAILogicComponent>();
+	enemy.AddComponent<SquashableComponent>();
 	const auto renderComp = enemy.AddComponent<kob::ImageRendererComponent>(sheet->GetTexture());
 	const auto animator = enemy.AddComponent<kob::Animator>(renderComp, sheet);
 	const auto movement = enemy.AddComponent<MovementComponent>(speed, true);

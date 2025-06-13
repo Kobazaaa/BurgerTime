@@ -28,6 +28,7 @@ list(APPEND BURGER_TIME_SOURCES
     "${SOURCE_DIR}/Components/HealthUIManager.cpp"          "${SOURCE_DIR}/Components/HealthUIManager.h"
     "${SOURCE_DIR}/Components/EnemyAILogicComponent.cpp"    "${SOURCE_DIR}/Components/EnemyAILogicComponent.h"
     "${SOURCE_DIR}/Components/MenuComponent.cpp"            "${SOURCE_DIR}/Components/MenuComponent.h"
+    "${SOURCE_DIR}/Components/SquashableComponent.cpp"      "${SOURCE_DIR}/Components/SquashableComponent.h"
 
     # Commands
     "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"         "${SOURCE_DIR}/InputCommands/DamageCommand.h"

@@ -3,6 +3,7 @@
 #include "IngredientTileComponent.h"
 #include "MovementComponent.h"
 #include "EnemyAILogicComponent.h"
+#include "SquashableComponent.h"
 #include "Timer.h"
 
 //--------------------------------------------------
@@ -87,7 +88,10 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 			!movementComp->immobilized)
 			m_vEnemiesOnTop.insert(comp);
 		else if (m_Falling && !movementComp->immobilized)
-			comp->GetSquashed();
+		{
+			if (const auto squash = other.GetComponent<SquashableComponent>())
+				squash->Squash();
+		}
 	}
 }
 void bt::IngredientComponent::OnCollisionExit(kob::GameObject& other)

@@ -1,25 +1,26 @@
 #pragma once
 #include "Component.h"
+#include "Event.h"
 
 namespace bt
 {
-	class MovementComponent;
-	class EnemyAILogicComponent final : public kob::Component
+	class SquashableComponent final : public kob::Component
 	{
 	public:
 		//--------------------------------------------------
 		//    Constructor
 		//--------------------------------------------------
-		explicit EnemyAILogicComponent(kob::GameObject& parent);
+		explicit SquashableComponent(kob::GameObject& parent);
 
 		//--------------------------------------------------
 		//    Loop
 		//--------------------------------------------------
-		void Start() override;
 		void Update() override;
+		bool IsSquashed() const;
+		void Squash();
+		void Reset();
 
 	private:
-		MovementComponent* m_pMovementComponent{};
-		kob::GameObject* m_pPlayer{};
+		bool m_Squashed = false;
 	};
 }
