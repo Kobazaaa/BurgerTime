@@ -1,6 +1,7 @@
 #include "IngredientTileComponent.h"
 #include "GameObject.h"
 #include "MovementComponent.h"
+#include "ServiceLocator.h"
 
 
 //--------------------------------------------------
@@ -21,6 +22,7 @@ void bt::IngredientTileComponent::OnCollisionStay(kob::GameObject& other)
 	{
 		m_HasBeenSteppedOn = true;
 		WasSteppedOnEvent(*this);
+		kob::ServiceLocator::GetSoundService().Play("sound/Burger Step.wav", 1);
 	}
 }
 

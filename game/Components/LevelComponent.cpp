@@ -305,15 +305,15 @@ bool bt::LevelComponent::IsLadderAbove(uint32_t x, uint32_t y) const
 
 std::string bt::LevelComponent::GetPlatformPath(uint32_t x) const
 {
-	if (x % 4 == 0)
+	if ((x + 1) % 4 == 0)
 		return "level/tiles/PlatformLight.png";
-	if (x % 2 == 0)
+	if ((x + 1) % 2 == 0)
 		return "level/tiles/PlatformDark2.png";
 	return "level/tiles/PlatformDark.png";
 }
 std::string bt::LevelComponent::GetLadderPlatformPath(uint32_t x) const
 {
-	if (x % 4 == 0)
+	if ((x + 1) % 4 == 0)
 		return "level/tiles/LadderPlatformLight.png";
 	return "level/tiles/LadderPlatformDark.png";
 }
@@ -466,7 +466,7 @@ kob::GameObject* bt::LevelComponent::SpawnChef(const std::string& name, const st
 	chefHealth->OnDamageTaken() += []
 	{
 		kob::ServiceLocator::GetSoundService().Pause("sound/BGM.wav");
-		kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 0.25f, 0);
+		kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 1.f, 0);
 	};
 	chef.AddComponent<ScoreComponent>();
 	const auto renderComp = chef.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());

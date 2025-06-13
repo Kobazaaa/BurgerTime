@@ -3,6 +3,7 @@
 #include "IngredientTileComponent.h"
 #include "MovementComponent.h"
 #include "EnemyAILogicComponent.h"
+#include "ServiceLocator.h"
 #include "SquashableComponent.h"
 #include "Timer.h"
 
@@ -72,10 +73,14 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 	}
 	else if (other.CompareTag("Plate"))
 	{
-		StopFalling(true);
-		if (!m_OnPlate)
-			OnPlateReached();
-		m_OnPlate = true;
+		if (!m_HitPlatformThisFrame)
+		{
+			StopFalling(true);
+			if (!m_OnPlate)
+				OnPlateReached();
+			m_OnPlate = true;
+			m_HitPlatformThisFrame = true;
+		}
 	}
 
 	if (other.CompareTag("Enemy"))
@@ -168,9 +173,12 @@ void bt::IngredientComponent::StartFalling()
 	{
 		const auto squash = enemy->GetGameObject()->GetComponent<SquashableComponent>();
 		if (squash && squash->IsSquashed()) continue;
+		kob::ServiceLocator::GetSoundService().Play("sound/Enemy Fall.wav", 1);
 		enemy->GetGameObject()->GetComponent<MovementComponent>()->Immobilize();
 		enemy->GetGameObject()->SetParent(GetGameObject(), true);
 	}
+
+	kob::ServiceLocator::GetSoundService().Play("sound/Burger Fall.wav", 1);
 }
 void bt::IngredientComponent::StopFalling(bool unParent)
 {
@@ -179,6 +187,7 @@ void bt::IngredientComponent::StopFalling(bool unParent)
 	m_Falling = false;
 	for (const auto& c : m_vChildTiles)
 		c->ResetCollision();
+	kob::ServiceLocator::GetSoundService().Play("sound/Burger Land.wav", 1);
 
 	if (!unParent)
 		return;

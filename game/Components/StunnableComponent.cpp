@@ -2,6 +2,7 @@
 #include "Animator.h"
 #include "GameObject.h"
 #include "MovementComponent.h"
+#include "ServiceLocator.h"
 #include "Timer.h"
 
 //--------------------------------------------------
@@ -35,7 +36,7 @@ void bt::StunnableComponent::Update()
 }
 void bt::StunnableComponent::Stun(float duration)
 {
-
+	kob::ServiceLocator::GetSoundService().Play("sound/Enemy Sprayed.wav", 1);
 	m_WasImmobileOnStun = m_pMovementComponent->IsImmobile();
 	m_pMovementComponent->Immobilize(false);
 	m_StunTime = duration;

@@ -52,6 +52,7 @@ void kob::Kobengine::Setup()
 	//Renderer::GetInstance().SetLogicalSize(static_cast<int>(WINDOW_WIDTH), static_cast<int>(WINDOW_HEIGHT));
 
 	// Game Setup
+	ServiceLocator::GetSoundService().SetGlobalVolumeScale(0.25);
 	auto& scene = SceneManager::GetInstance().CreateScene("GameScene");
 
 	auto& gameManager = scene.AddEmpty("GameManager");

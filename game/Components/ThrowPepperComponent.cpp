@@ -9,6 +9,7 @@
 #include "PepperComponent.h"
 #include "ResourceManager.h"
 #include "Scene.h"
+#include "ServiceLocator.h"
 
 
 //--------------------------------------------------
@@ -59,6 +60,7 @@ void bt::ThrowPepperComponent::ThrowPepper(const glm::vec2& dir, float dst)
 
 	m_Pepper--;
 	m_Pepper = std::max(m_Pepper, 0);
+	kob::ServiceLocator::GetSoundService().Play("sound/Pepper Shake.wav", 1);
 	OnPepperChange(m_Pepper);
 }
 void bt::ThrowPepperComponent::AddPepper() { ++m_Pepper; OnPepperChange(m_Pepper); }

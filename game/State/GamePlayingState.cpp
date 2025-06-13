@@ -58,6 +58,7 @@ void bt::GamePlayingState::OnExit()
 {
 	m_EndGame = true;
 	m_pLevelObject->FlagForDeletion();
+	m_pLevelObject = nullptr;
 	kob::InputManager::GetInstance().UnregisterAll();
 }
 

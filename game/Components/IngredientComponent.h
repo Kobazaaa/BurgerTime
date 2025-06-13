@@ -42,7 +42,7 @@ namespace bt
 		float m_FallVelocity{ 0.f };
 		float m_Acceleration{ 100.f };
 		float m_Bounciness{ -20.f };
-		bool m_HitPlatformThisFrame{};
+		bool m_HitPlatformThisFrame{true};
 
 		// plate
 		bool m_OnPlate = false;

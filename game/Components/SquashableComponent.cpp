@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "MovementComponent.h"
 #include "RespawnComponent.h"
+#include "ServiceLocator.h"
 
 
 //--------------------------------------------------
@@ -23,6 +24,7 @@ void bt::SquashableComponent::Update()
 
 void bt::SquashableComponent::Squash()
 {
+	kob::ServiceLocator::GetSoundService().Play("sound/Enemy Squahed.wav", 1);
 	m_Squashed = true;
 	OnSquashed();
 	if (auto anim = GetGameObject()->GetComponent<kob::Animator>())
