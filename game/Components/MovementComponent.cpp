@@ -60,17 +60,18 @@ void bt::MovementComponent::Update()
 	const auto newPos = currPos + glm::vec3(m_Dir.x, m_Dir.y, 0) * kob::Timer::GetDeltaSeconds() * m_Speed;
 	GetGameObject()->SetLocalPosition(newPos);
 
-	m_MovementDir = m_Dir;
 	if (m_pAnimator)
 	{
-		if (abs(m_MovementDir.y) > abs(m_MovementDir.x))
-			m_pAnimator->Play(m_MovementDir.y < 0 ? "Up" : "Down", true);
-		else if (abs(m_MovementDir.y) < abs(m_MovementDir.x))
-			m_pAnimator->Play(m_MovementDir.x < 0 ? "Left" : "Right", true);
+		if (abs(m_Dir.y) > abs(m_Dir.x))
+			m_pAnimator->Play(m_Dir.y < 0 ? "Up" : "Down", true);
+		else if (abs(m_Dir.y) < abs(m_Dir.x))
+			m_pAnimator->Play(m_Dir.x < 0 ? "Left" : "Right", true);
 		else
 			m_pAnimator->Stop(1);
 	}
 
+	if (m_Dir != glm::vec2{ 0, 0 })
+		m_MovementDir = m_Dir;
 	m_Dir = { 0, 0 };
 }
 

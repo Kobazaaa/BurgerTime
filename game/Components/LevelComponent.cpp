@@ -13,6 +13,7 @@
 #include "IngredientTileComponent.h"
 #include "IngredientComponent.h"
 #include "ResourceManager.h"
+#include "RespawnComponent.h"
 #include "ScoreCommand.h"
 #include "ScoreComponent.h"
 #include "ServiceLocator.h"
@@ -545,7 +546,7 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 	// spawn go
 	auto& scene = GetGameObject()->GetScene();
 
-	// init chef
+	// init enemy
 	auto& enemy = scene.AddEmpty(name);
 	enemy.SetParent(GetGameObject());
 	enemy.SetRenderPriority(48);
@@ -553,7 +554,7 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 
 	// add components
 	enemy.AddComponent<EnemyAILogicComponent>();
-	enemy.AddComponent<SquashableComponent>();
+	auto squashComponent = enemy.AddComponent<SquashableComponent>();
 	enemy.AddComponent<StunnableComponent>();
 	const auto renderComp = enemy.AddComponent<kob::ImageRendererComponent>(sheet->GetTexture());
 	const auto animator = enemy.AddComponent<kob::Animator>(renderComp, sheet);
@@ -565,6 +566,9 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 	auto spawn = ColRowToCenterPos(xy);
 	enemy.SetLocalPosition({ spawn.x, spawn.y, 0 });
 	enemy.SetLocalScale(glm::vec3(2, 2, 2));
+	auto respawnComponent = enemy.AddComponent<RespawnComponent>(1.f, spawn);
+	squashComponent->OnSquashed += &respawnComponent->Respawn;
+	respawnComponent->OnRespawn += &squashComponent->ResetCallback;
 
 	// Add collider
 	auto collider = enemy.AddComponent<kob::ColliderComponent>();

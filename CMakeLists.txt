@@ -32,6 +32,7 @@ list(APPEND BURGER_TIME_SOURCES
     "${SOURCE_DIR}/Components/PepperComponent.cpp"          "${SOURCE_DIR}/Components/PepperComponent.h"
     "${SOURCE_DIR}/Components/StunnableComponent.cpp"       "${SOURCE_DIR}/Components/StunnableComponent.h"
     "${SOURCE_DIR}/Components/ThrowPepperComponent.cpp"     "${SOURCE_DIR}/Components/ThrowPepperComponent.h"
+    "${SOURCE_DIR}/Components/RespawnComponent.cpp"         "${SOURCE_DIR}/Components/RespawnComponent.h"
 
     # Commands
     "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"         "${SOURCE_DIR}/InputCommands/DamageCommand.h"

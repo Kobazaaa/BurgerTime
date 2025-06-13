@@ -20,6 +20,12 @@ namespace bt
 		void Squash();
 		void Reset();
 
+		//--------------------------------------------------
+		//    Events
+		//--------------------------------------------------
+		kob::Event<> OnSquashed{};
+		kob::EventCallback<> ResetCallback{ kob::EventCallback<>(this, &SquashableComponent::Reset )};
+
 	private:
 		bool m_Squashed = false;
 	};

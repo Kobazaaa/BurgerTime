@@ -4,6 +4,7 @@
 #include "Animator.h"
 #include "GameObject.h"
 #include "MovementComponent.h"
+#include "RespawnComponent.h"
 
 
 //--------------------------------------------------
@@ -23,10 +24,16 @@ void bt::SquashableComponent::Update()
 void bt::SquashableComponent::Squash()
 {
 	m_Squashed = true;
+	OnSquashed();
 	if (auto anim = GetGameObject()->GetComponent<kob::Animator>())
 		anim->Play("Squashed", false);
 	if (auto move = GetGameObject()->GetComponent<MovementComponent>())
-		move->Immobilize();
+		move->Immobilize(false);
 }
 bool bt::SquashableComponent::IsSquashed() const { return m_Squashed; }
-void bt::SquashableComponent::Reset() { m_Squashed = false; }
+void bt::SquashableComponent::Reset()
+{
+	m_Squashed = false;
+	if (auto move = GetGameObject()->GetComponent<MovementComponent>())
+		move->Mobilize();
+}
