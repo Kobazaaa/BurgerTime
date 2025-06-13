@@ -19,6 +19,7 @@ void bt::IngredientTileComponent::OnCollisionEnter(kob::GameObject& other)
 {
 	if (!m_HasBeenSteppedOn && other.CompareTag("Player"))
 	{
+		//other.GetComponent<MovementComponent>().
 		m_HasBeenSteppedOn = true;
 		WasSteppedOnEvent(*this);
 	}

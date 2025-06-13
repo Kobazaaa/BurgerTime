@@ -27,7 +27,9 @@ void bt::MovementComponent::Start()
 }
 void bt::MovementComponent::Update()
 {
-	if (immobilized || m_Dir == glm::vec2{ 0, 0 })
+	if (m_Immobilized)
+		return;
+	if (m_Dir == glm::vec2{ 0, 0 })
 	{
 		if (m_pAnimator)
 			m_pAnimator->Stop(1);
@@ -36,7 +38,7 @@ void bt::MovementComponent::Update()
 
 	auto currPos = GetGameObject()->GetLocalTransform().GetPosition();
 	const auto colRow = m_pCurrentLevel->PosToColRow(currPos);
-	auto snapPos = m_pCurrentLevel->ColRowToCenterPos(colRow);
+	const auto snapPos = m_pCurrentLevel->ColRowToCenterPos(colRow);
 
 	if (!(m_Dir.y > FLT_EPSILON && CanMoveDown())
 		&& !(-m_Dir.y > FLT_EPSILON && CanMoveUp()))
@@ -61,14 +63,14 @@ void bt::MovementComponent::Update()
 	m_MovementDir = m_Dir;
 	if (m_pAnimator)
 	{
-		if (m_MovementDir.x < 0)
-			m_pAnimator->Play("Left", true);
-		else if (m_MovementDir.x > 0)
-			m_pAnimator->Play("Right", true);
-		else if (m_MovementDir.y < 0)
+		if (m_MovementDir.y < 0)
 			m_pAnimator->Play("Up", true);
 		else if (m_MovementDir.y > 0)
 			m_pAnimator->Play("Down", true);
+		else if (m_MovementDir.x < 0)
+			m_pAnimator->Play("Left", true);
+		else if (m_MovementDir.x > 0)
+			m_pAnimator->Play("Right", true);
 		else
 			m_pAnimator->Stop(1);
 	}
@@ -83,6 +85,14 @@ void bt::MovementComponent::Move(const glm::vec2& direction)				{ m_Dir += norma
 glm::vec2 bt::MovementComponent::GetDirection() const						{ return m_MovementDir; }
 void bt::MovementComponent::SetSpeed(float speed)							{ m_Speed = speed; }
 void bt::MovementComponent::SetCurrentLevel(const LevelComponent& level)	{ m_pCurrentLevel = &level; }
+void bt::MovementComponent::Immobilize(bool stopAnimation)
+{
+	m_Immobilized = true;
+	if (stopAnimation && m_pAnimator)
+		m_pAnimator->Stop(1);
+}
+void bt::MovementComponent::Mobilize() { m_Immobilized = false; }
+bool bt::MovementComponent::IsImmobile() const { return m_Immobilized; }
 
 
 //--------------------------------------------------

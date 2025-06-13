@@ -25,7 +25,7 @@
 
 // COMMANDS
 #include "Animator.h"
-#include "MoveCommands.h"
+#include "PlayingCommands.h"
 #include "DamageCommand.h"
 #include "ScoreCommand.h"
 #include "SpriteSheet.h"

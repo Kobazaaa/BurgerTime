@@ -29,10 +29,13 @@ list(APPEND BURGER_TIME_SOURCES
     "${SOURCE_DIR}/Components/EnemyAILogicComponent.cpp"    "${SOURCE_DIR}/Components/EnemyAILogicComponent.h"
     "${SOURCE_DIR}/Components/MenuComponent.cpp"            "${SOURCE_DIR}/Components/MenuComponent.h"
     "${SOURCE_DIR}/Components/SquashableComponent.cpp"      "${SOURCE_DIR}/Components/SquashableComponent.h"
+    "${SOURCE_DIR}/Components/PepperComponent.cpp"          "${SOURCE_DIR}/Components/PepperComponent.h"
+    "${SOURCE_DIR}/Components/StunnableComponent.cpp"       "${SOURCE_DIR}/Components/StunnableComponent.h"
+    "${SOURCE_DIR}/Components/ThrowPepperComponent.cpp"     "${SOURCE_DIR}/Components/ThrowPepperComponent.h"
 
     # Commands
     "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"         "${SOURCE_DIR}/InputCommands/DamageCommand.h"
-    "${SOURCE_DIR}/InputCommands/MoveCommands.cpp"          "${SOURCE_DIR}/InputCommands/MoveCommands.h"
+    "${SOURCE_DIR}/InputCommands/PlayingCommands.cpp"       "${SOURCE_DIR}/InputCommands/PlayingCommands.h"
     "${SOURCE_DIR}/InputCommands/StateCommands.cpp"         "${SOURCE_DIR}/InputCommands/StateCommands.h"
     "${SOURCE_DIR}/InputCommands/ScoreCommand.cpp"          "${SOURCE_DIR}/InputCommands/ScoreCommand.h"
 

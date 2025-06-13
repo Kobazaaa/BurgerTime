@@ -6,7 +6,7 @@
 #include "InputManager.h"
 #include "SceneManager.h"
 #include "LevelLoader.h"
-#include "MoveCommands.h"
+#include "PlayingCommands.h"
 #include "MovementComponent.h"
 #include "ColliderComponent.h"
 #include "EnemyAILogicComponent.h"
@@ -17,6 +17,7 @@
 #include "ScoreComponent.h"
 #include "ServiceLocator.h"
 #include "SquashableComponent.h"
+#include "StunnableComponent.h"
 
 //--------------------------------------------------
 //    Constructor
@@ -487,12 +488,16 @@ void bt::LevelComponent::SpawnChef() const
 	auto collider = chef.AddComponent<kob::ColliderComponent>();
 	collider->SetHalfSize({ chefTxtSize * 3.f / 4.f, chefTxtSize, chefTxtSize });
 
+	// pepper
+	auto chefPepper = chef.AddComponent<ThrowPepperComponent>(5);
+
 	// input
 	auto& inputManager = kob::InputManager::GetInstance();
 	inputManager.RegisterKeyboardCmd(SDLK_w, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0, -1, 0 }));
 	inputManager.RegisterKeyboardCmd(SDLK_s, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 0,  1, 0 }));
 	inputManager.RegisterKeyboardCmd(SDLK_d, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ 1,  0, 0 }));
 	inputManager.RegisterKeyboardCmd(SDLK_a, kob::TriggerState::Down, std::make_unique<MoveCommand>(*chefMovement, glm::vec3{ -1,  0, 0 }));
+	inputManager.RegisterKeyboardCmd(SDLK_SPACE, kob::TriggerState::Pressed, std::make_unique<ThrowPepperCommand>(*chefMovement, *chefPepper, m_TileSize));
 
 	inputManager.RegisterKeyboardCmd(SDLK_c, kob::TriggerState::Pressed, std::make_unique<DamageCommand>(*chefHealth));
 	inputManager.RegisterKeyboardCmd(SDLK_z, kob::TriggerState::Pressed, std::make_unique<ScoreCommand>(*chefScore, 10));
@@ -507,6 +512,7 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 
 	constexpr float walkDelay = 0.1f;
 	constexpr float deathDelay = 0.1f;
+	constexpr float stunDelay = 0.25f;
 	constexpr int txtSize = 16;
 	constexpr float speed = 40.f;
 	auto sheet = kob::ResourceManager::GetInstance().LoadSpriteSheet(sheetPath,
@@ -537,7 +543,12 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 					{16, 32, txtSize, txtSize},
 					{32, 32, txtSize, txtSize},
 					{48, 32, txtSize, txtSize},
-				}, deathDelay} }
+				}, deathDelay} },
+			{"Stunned", {
+				{
+					{64, 32, txtSize, txtSize},
+					{64, 16, txtSize, txtSize},
+				}, stunDelay} }
 		});
 
 	// spawn go
@@ -552,6 +563,7 @@ void bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& 
 	// add components
 	enemy.AddComponent<EnemyAILogicComponent>();
 	enemy.AddComponent<SquashableComponent>();
+	enemy.AddComponent<StunnableComponent>();
 	const auto renderComp = enemy.AddComponent<kob::ImageRendererComponent>(sheet->GetTexture());
 	const auto animator = enemy.AddComponent<kob::Animator>(renderComp, sheet);
 	const auto movement = enemy.AddComponent<MovementComponent>(speed, true);

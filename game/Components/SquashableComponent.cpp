@@ -26,7 +26,7 @@ void bt::SquashableComponent::Squash()
 	if (auto anim = GetGameObject()->GetComponent<kob::Animator>())
 		anim->Play("Squashed", false);
 	if (auto move = GetGameObject()->GetComponent<MovementComponent>())
-		move->immobilized = true;
+		move->Immobilize();
 }
 bool bt::SquashableComponent::IsSquashed() const { return m_Squashed; }
 void bt::SquashableComponent::Reset() { m_Squashed = false; }

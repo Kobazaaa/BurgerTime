@@ -31,7 +31,9 @@ namespace bt
 		glm::vec2 GetDirection() const;
 		void SetSpeed(float speed);
 		void SetCurrentLevel(const LevelComponent& level);
-		bool immobilized = false;
+		void Immobilize(bool stopAnimation = true);
+		void Mobilize();
+		bool IsImmobile() const;
 
 	private:
 		// Functions
@@ -42,7 +44,9 @@ namespace bt
 
 		// Data
 		bool m_IsEnemy{ false };
+
 		float m_Speed{};
+		bool m_Immobilized{false};
 		glm::vec2 m_Dir{};
 		glm::vec2 m_MovementDir{};
 		float m_AlignmentMargin{ 2.f };
