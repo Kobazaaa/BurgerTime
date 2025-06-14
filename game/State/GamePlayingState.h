@@ -28,7 +28,7 @@ namespace bt
 		//    Extra
 		//--------------------------------------------------
 		void PlayerDied();
-		void ResetCurrentLevel();
+		void ResetCurrentLevel() const;
 		void LoadNextLevel(int id);
 		void SetupPlayers();
 		void SetupUI() const;

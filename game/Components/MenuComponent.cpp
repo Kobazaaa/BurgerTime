@@ -1,6 +1,4 @@
 #include "MenuComponent.h"
-#include <algorithm>
-
 #include "GameObject.h"
 #include "Scene.h"
 #include "TextRendererComponent.h"

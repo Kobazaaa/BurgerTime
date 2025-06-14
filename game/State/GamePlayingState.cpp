@@ -61,13 +61,16 @@ void bt::GamePlayingState::OnEnter()
 {
 	m_EndGameDelay = -1;
 	m_LevelClearedDelay = -1;
-	m_LevelClearedDelay = -1;
+	m_PlayerDiedResetDelay = -1;
 	LoadNextLevel(1);
 	SetupPlayers();
 }
 
 void bt::GamePlayingState::OnExit()
 {
+	m_EndGameDelay = -1;
+	m_LevelClearedDelay = -1;
+	m_PlayerDiedResetDelay = -1;
 	m_pLevelObject->FlagForDeletion();
 	m_pLevelObject = nullptr;
 	for (auto& p : m_vPlayers)
@@ -95,7 +98,7 @@ void bt::GamePlayingState::PlayerDied()
 	}
 	m_PlayerDiedResetDelay = 3.f;
 }
-void bt::GamePlayingState::ResetCurrentLevel()
+void bt::GamePlayingState::ResetCurrentLevel() const
 {
 	auto players = m_pLevelObject->GetScene().GetObjectsByTag("Player");
 	LevelComponent* pLvl = m_pLevelObject->GetComponent<LevelComponent>();
@@ -241,8 +244,18 @@ void bt::GamePlayingState::SetupPlayers()
 
 		const auto movement = player->GetComponent<MovementComponent>();
 		const auto pepper = player->GetComponent<ThrowPepperComponent>();
+		inputManager.RegisterGamepad();
+		inputManager.RegisterGamepad();
+		int gamepadIdx = GetGameManager()->gameMode == GameMode::Solo ? 0 : 1;
 		if (idx == 0)
 		{
+			// WASD
+			inputManager.RegisterKeyboardCmd(SDLK_UP, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0, -1, 0 }));
+			inputManager.RegisterKeyboardCmd(SDLK_DOWN, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0,  1, 0 }));
+			inputManager.RegisterKeyboardCmd(SDLK_RIGHT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 1,  0, 0 }));
+			inputManager.RegisterKeyboardCmd(SDLK_LEFT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ -1,  0, 0 }));
+
+			// ARROWS
 			inputManager.RegisterKeyboardCmd(SDLK_w, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0, -1, 0 }));
 			inputManager.RegisterKeyboardCmd(SDLK_s, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0,  1, 0 }));
 			inputManager.RegisterKeyboardCmd(SDLK_d, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 1,  0, 0 }));
@@ -250,24 +263,23 @@ void bt::GamePlayingState::SetupPlayers()
 			if (pepper)
 				inputManager.RegisterKeyboardCmd(SDLK_SPACE, kob::TriggerState::Pressed, std::make_unique<ThrowPepperCommand>(*movement, *pepper, levelComp->GetTileSize()));
 
-			//if (!inputManager.GetGamepad(0))
-			//	inputManager.RegisterGamepad();
-			//inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_UP, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0, -1, 0 }), 0);
-			//inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_DOWN, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0,  1, 0 }), 0);
-			//inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_RIGHT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 1,  0, 0 }), 0);
-			//inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_LEFT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ -1,  0, 0 }), 0);
-			//inputManager.RegisterGamepadCmd(kob::Gamepad::Button::A, kob::TriggerState::Pressed, std::make_unique<ThrowPepperCommand>(*movement, *pepper, levelComp->GetTileSize()), 0);
+			// GAMEPAD
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_UP, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0, -1, 0 }), gamepadIdx);
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_DOWN, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0,  1, 0 }), gamepadIdx);
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_RIGHT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 1,  0, 0 }), gamepadIdx);
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_LEFT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ -1,  0, 0 }), gamepadIdx);
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::A, kob::TriggerState::Pressed, std::make_unique<ThrowPepperCommand>(*movement, *pepper, levelComp->GetTileSize()), gamepadIdx);
 		}
 		else if (idx == 1)
 		{
-			if (!inputManager.GetGamepad(0))
-				inputManager.RegisterGamepad();
-			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_UP, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0, -1, 0 }), 0);
-			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_DOWN, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0,  1, 0 }), 0);
-			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_RIGHT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 1,  0, 0 }), 0);
-			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_LEFT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ -1,  0, 0 }), 0);
+			// GAMEPAD
+			gamepadIdx = 0;
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_UP, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0, -1, 0 }), gamepadIdx);
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_DOWN, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 0,  1, 0 }), gamepadIdx);
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_RIGHT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ 1,  0, 0 }), gamepadIdx);
+			inputManager.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_LEFT, kob::TriggerState::Down, std::make_unique<MoveCommand>(*movement, glm::vec3{ -1,  0, 0 }), gamepadIdx);
 			if (pepper)
-				inputManager.RegisterGamepadCmd(kob::Gamepad::Button::A, kob::TriggerState::Pressed, std::make_unique<ThrowPepperCommand>(*movement, *pepper, levelComp->GetTileSize()), 0);
+				inputManager.RegisterGamepadCmd(kob::Gamepad::Button::A, kob::TriggerState::Pressed, std::make_unique<ThrowPepperCommand>(*movement, *pepper, levelComp->GetTileSize()), gamepadIdx);
 		}
 		++idx;
 	}
@@ -336,7 +348,7 @@ void bt::GamePlayingState::SetupUI() const
 }
 void bt::GamePlayingState::OnIngredientCompleted()
 {
-	++m_IngredientCount;
+	++m_CompletedIngredientCount;
 	if (m_IngredientCount == m_CompletedIngredientCount)
 	{
 		kob::ServiceLocator::GetSoundService().StopAll();

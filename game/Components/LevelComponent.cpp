@@ -225,7 +225,7 @@ bool bt::LevelComponent::IsLadder(uint32_t col, uint32_t row, bool isEnemy) cons
 	const bool playerAllowed =
 		tile == TileType::Ladder
 		|| tile == TileType::LadderPlatform;
-	const bool enemyAllowed = playerAllowed || tile == TileType::HiddenLadder;
+	const bool enemyAllowed = playerAllowed || tile == TileType::HiddenLadder || tile == TileType::Plate;
 	return isEnemy ? enemyAllowed : playerAllowed;
 }
 bool bt::LevelComponent::CanMoveSide(uint32_t col, uint32_t row, bool isEnemy) const
@@ -617,6 +617,7 @@ kob::GameObject* bt::LevelComponent::SpawnEnemy(const std::string& name, const s
 	auto respawnComponent = enemy.AddComponent<RespawnComponent>(1.f, spawn);
 	squashComponent->OnSquashed += &respawnComponent->RespawnDelayCallback;
 	respawnComponent->OnRespawn += &squashComponent->ResetCallback;
+	respawnComponent->OnRespawn += std::bind(&MovementComponent::Mobilize, movement);
 
 	// Add collider
 	auto collider = enemy.AddComponent<kob::ColliderComponent>();

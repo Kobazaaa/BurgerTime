@@ -180,6 +180,7 @@ void bt::IngredientComponent::StartFalling()
 	}
 
 	m_ExtraLevelsToDrop = static_cast<int>(m_vEnemiesOnTop.size());
+	m_CarryEnemyCount = 0;
 	for (auto& enemy : m_vEnemiesOnTop)
 	{
 		const auto squash = enemy->GetGameObject()->GetComponent<SquashableComponent>();
