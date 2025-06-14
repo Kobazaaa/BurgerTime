@@ -18,6 +18,7 @@
 #include "PlayingCommands.h"
 #include "RespawnComponent.h"
 #include "ScoreCommand.h"
+#include "ServiceLocator.h"
 #include "Timer.h"
 
 //--------------------------------------------------
@@ -240,7 +241,8 @@ void bt::GamePlayingState::SetupPlayers()
 	}
 
 	// general input
-	inputManager.RegisterKeyboardCmd(SDLK_F1, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] {LoadNextLevel(m_NextLevelID); }));
+	inputManager.RegisterKeyboardCmd(SDLK_F1, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { LoadNextLevel(m_NextLevelID); }));
+	inputManager.RegisterKeyboardCmd(SDLK_F2, kob::TriggerState::Pressed, std::make_unique<ToggleMuteSoundCommand>());
 
 }
 void bt::GamePlayingState::SetupUI()

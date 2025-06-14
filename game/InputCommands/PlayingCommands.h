@@ -26,4 +26,13 @@ namespace bt
 		ThrowPepperComponent* m_pThrowPepperComponent;
 		float m_Dst{};
 	};
+	class ToggleMuteSoundCommand final : public kob::Command
+	{
+	public:
+		ToggleMuteSoundCommand() = default;
+		void Execute() override;
+	private:
+		float m_GlobalVolumeScale{};
+		bool m_Muted{ false };
+	};
 }
