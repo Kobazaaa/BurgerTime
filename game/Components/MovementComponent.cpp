@@ -1,4 +1,3 @@
-#include <numbers>
 #include "MovementComponent.h"
 #include "Animator.h"
 #include "GameObject.h"
@@ -11,10 +10,10 @@
 //--------------------------------------------------
 bt::MovementComponent::MovementComponent(kob::GameObject& parent, float speed, bool isEnemy)
 	: Component(parent)
+	, m_IsEnemy(isEnemy)
 	, m_Speed(speed)
 	, m_Dir(0.f, 0.f)
 	, m_pAnimator(nullptr)
-	, m_IsEnemy(isEnemy)
 {}
 
 

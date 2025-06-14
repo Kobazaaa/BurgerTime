@@ -50,7 +50,7 @@ namespace bt
 		glm::vec2 m_Dir{};
 		glm::vec2 m_MovementDir{};
 		float m_AlignmentMargin{ 2.f };
-		kob::Animator* m_pAnimator;
-		const LevelComponent* m_pCurrentLevel;
+		kob::Animator* m_pAnimator{};
+		const LevelComponent* m_pCurrentLevel{};
 	};
 }

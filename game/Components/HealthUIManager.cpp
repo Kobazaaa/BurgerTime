@@ -57,5 +57,3 @@ void bt::HealthUIManager::OnHealthChanged(int newHealth)
 {
 	m_LivesToRender = newHealth - 1;
 }
-
-

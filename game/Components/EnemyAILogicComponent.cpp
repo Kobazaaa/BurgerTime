@@ -24,6 +24,7 @@ void bt::EnemyAILogicComponent::Update()
 	if (!m_pMovementComponent || m_vPlayers.empty())
 		return;
 
+	// find closest pplayer
 	const auto& myPos = GetGameObject()->GetWorldTransform().GetPosition();
 	std::ranges::sort(m_vPlayers, [&](kob::GameObject* a, kob::GameObject* b)
 	{
@@ -37,6 +38,7 @@ void bt::EnemyAILogicComponent::Update()
 	glm::vec2 toPlayer = playerPos - myPos;
 	const auto currDir = m_pMovementComponent->GetDirection();
 
+	// move
 	if (std::signbit(currDir.y) != std::signbit(toPlayer.y) && abs(currDir.y) > FLT_EPSILON)
 		toPlayer.y = currDir.y;
 	if (std::signbit(currDir.x) != std::signbit(toPlayer.x) && abs(currDir.x) > FLT_EPSILON)

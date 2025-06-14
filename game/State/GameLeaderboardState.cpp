@@ -30,18 +30,19 @@ bt::GameLeaderboardState::GameLeaderboardState(GameManagerComponent& gameManager
 	auto menu = info->AddComponent<MenuComponent>(*fontL);
 	m_pMenuComponent = menu;
 
-	std::vector<std::string> labels = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-										"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
-										"U", "V", "W", "X", "Y", "Z"};
-
-	const float startX = 50.f;
-	const float startY = 50.f;
-	const float stepY = 75.f;
-	const float stepX = 50.f;
+	const std::vector<std::string> labels = 
+	{	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+		"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+		"U", "V", "W", "X", "Y", "Z"};
+	constexpr int cols = 10;
+	constexpr float startX = 50.f;
+	constexpr float startY = 50.f;
+	constexpr float stepY = 75.f;
+	constexpr float stepX = 50.f;
 	for (size_t i = 0; i < labels.size(); ++i)
 	{
-		size_t col = i % 10;
-		size_t row = i / 10;
+		size_t col = i % cols;
+		size_t row = i / cols;
 
 		float posX = startX + col * stepX;
 		float posY = startY + row * stepY;
@@ -117,20 +118,19 @@ void bt::GameLeaderboardState::OnEnter()
 
 	LoadTopScores(5);
 	int idx = 0;
-	for (auto& r : m_vLoadedHighScores)
+	for (auto& [name, score] : m_vLoadedHighScores)
 	{
 		float yOffset = 250.f + (idx + 1) * 25.f;
 
-		auto& name = scene.AddEmpty(r.name);
-		name.SetParent(m_pLeaderboardObject);
-		name.AddComponent<kob::TextRendererComponent>(r.name, fontS);
-		name.SetLocalPosition({ 50, yOffset, 0});
+		auto& nameGO = scene.AddEmpty(name);
+		nameGO.SetParent(m_pLeaderboardObject);
+		nameGO.AddComponent<kob::TextRendererComponent>(name, fontS);
+		nameGO.SetLocalPosition({ 50, yOffset, 0});
 
-		auto& score = scene.AddEmpty(std::to_string(r.score));
-		score.SetParent(m_pLeaderboardObject);
-		score.AddComponent<kob::TextRendererComponent>(std::to_string(r.score), fontS);
-		score.SetLocalPosition({ 250, yOffset, 0 });
-
+		auto& scoreGO = scene.AddEmpty(std::to_string(score));
+		scoreGO.SetParent(m_pLeaderboardObject);
+		scoreGO.AddComponent<kob::TextRendererComponent>(std::to_string(score), fontS);
+		scoreGO.SetLocalPosition({ 250, yOffset, 0 });
 		++idx;
 	}
 
@@ -188,8 +188,9 @@ void bt::GameLeaderboardState::SaveScore() const
 	inFile.close();
 	scores.push_back(m_NewValue);
 
-	std::ranges::sort(scores, [](const ScoreEntry& a, const ScoreEntry& b) {
-		return a.score > b.score;
+	std::ranges::sort(scores, [](const ScoreEntry& a, const ScoreEntry& b)
+		{
+			return a.score > b.score;
 		});
 
 	std::ofstream outFile(m_FileName, std::ios::trunc);
@@ -214,8 +215,9 @@ void bt::GameLeaderboardState::LoadTopScores(size_t count)
 			m_vLoadedHighScores.push_back(entry);
 	}
 
-	std::ranges::sort(m_vLoadedHighScores, [](const ScoreEntry& a, const ScoreEntry& b) {
-		return a.score > b.score;
+	std::ranges::sort(m_vLoadedHighScores, [](const ScoreEntry& a, const ScoreEntry& b)
+		{
+			return a.score > b.score;
 		});
 
 	if (m_vLoadedHighScores.size() > count)

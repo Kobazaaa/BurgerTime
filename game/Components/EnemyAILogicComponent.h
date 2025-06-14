@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-
 #include "Component.h"
 
 namespace bt

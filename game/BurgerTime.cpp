@@ -1,5 +1,4 @@
 // STANDARD
-#include <iostream>
 #include <SDL.h>
 
 // ENGINE
@@ -8,26 +7,11 @@
 #include "SceneManager.h"
 #include "ResourceManager.h"
 #include "Scene.h"
-#include "InputManager.h"
-#include "Renderer.h"
-
-#include "LevelLoader.h"
 
 // COMPONENTS
-#include "IntUIComponent.h"
-#include "ImageRendererComponent.h"
 #include "TextRendererComponent.h"
-#include "HealthComponent.h"
 #include "ScoreComponent.h"
-#include "GridRendererComponent.h"
 #include "GameManagerComponent.h"
-#include "LevelComponent.h"
-
-// COMMANDS
-#include "Animator.h"
-#include "PlayingCommands.h"
-#include "SpriteSheet.h"
-
 
 void kob::Kobengine::Setup()
 {
