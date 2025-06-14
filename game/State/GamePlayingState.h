@@ -31,7 +31,7 @@ namespace bt
 		void ResetCurrentLevel();
 		void LoadNextLevel(int id);
 		void SetupPlayers();
-		void SetupUI();
+		void SetupUI() const;
 		void OnIngredientCompleted();
 		void EndGame();
 
@@ -46,7 +46,8 @@ namespace bt
 		int m_IngredientCount{};
 		int m_NextLevelID{};
 		int m_MaxLevels{ 3 };
-		float m_ResetDelay{};
+		float m_PlayerDiedResetDelay{};
+		float m_LevelClearedDelay{};
 
 		bool m_EndGame{ false };
 	};

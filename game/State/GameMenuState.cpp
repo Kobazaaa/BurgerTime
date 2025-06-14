@@ -94,7 +94,7 @@ bt::IGameState* bt::GameMenuState::Update()
 
 void bt::GameMenuState::OnEnter()
 {
-	//kob::ServiceLocator::GetSoundService().Play("sound/BGM.wav", 0.25f, -1);
+	kob::ServiceLocator::GetSoundService().Play("sound/System Sound.wav", 1.f);
 
 	m_pMenuObject->SetActive(true);
 	m_pInfoObject->SetActive(false);

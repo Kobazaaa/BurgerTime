@@ -32,12 +32,12 @@ void bt::ToggleMuteSoundCommand::Execute()
 	if (m_Muted)
 	{
 		m_GlobalVolumeScale = kob::ServiceLocator::GetSoundService().GetGlobalVolumeScale();
-		kob::ServiceLocator::GetSoundService().StopAll();
-		kob::ServiceLocator::RegisterSoundService(std::make_unique<kob::NullSoundSystem>());
+		kob::ServiceLocator::GetSoundService().PauseAll();
+		kob::ServiceLocator::GetSoundService().SetGlobalVolumeScale(0.f);
 	}
 	else
 	{
-		kob::ServiceLocator::RegisterSoundService(std::make_unique<kob::SDLSoundSystem>());
 		kob::ServiceLocator::GetSoundService().SetGlobalVolumeScale(m_GlobalVolumeScale);
+		kob::ServiceLocator::GetSoundService().ResumeAll();
 	}
 }

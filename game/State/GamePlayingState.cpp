@@ -36,11 +36,17 @@ bt::GamePlayingState::GamePlayingState(GameManagerComponent& gameManagerComp)
 //--------------------------------------------------
 bt::IGameState* bt::GamePlayingState::Update()
 {
-	if (m_ResetDelay > 0)
+	if (m_PlayerDiedResetDelay > 0)
 	{
-		m_ResetDelay -= kob::Timer::GetDeltaSeconds();
-		if (m_ResetDelay <= 0)
+		m_PlayerDiedResetDelay -= kob::Timer::GetDeltaSeconds();
+		if (m_PlayerDiedResetDelay <= 0)
 			ResetCurrentLevel();
+	}
+	if (m_LevelClearedDelay > 0)
+	{
+		m_LevelClearedDelay -= kob::Timer::GetDeltaSeconds();
+		if (m_LevelClearedDelay <= 0)
+			LoadNextLevel(m_NextLevelID);
 	}
 
 	if (m_EndGame)
@@ -83,7 +89,7 @@ void bt::GamePlayingState::PlayerDied()
 		move->Immobilize(false);
 		comp->Play("Death", false);
 	}
-	m_ResetDelay = 3.f;
+	m_PlayerDiedResetDelay = 3.f;
 }
 void bt::GamePlayingState::ResetCurrentLevel()
 {
@@ -166,8 +172,14 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 	{
 		p->SetParent(m_pLevelObject, true);
 		if (auto move = p->GetComponent<MovementComponent>())
+		{
 			move->SetCurrentLevel(*pLvl);
+			move->Mobilize();
+		}
 	}
+
+	// music
+	kob::ServiceLocator::GetSoundService().Play("sound/BGM.wav", 1.f, -1);
 }
 void bt::GamePlayingState::SetupPlayers()
 {
@@ -241,11 +253,10 @@ void bt::GamePlayingState::SetupPlayers()
 	}
 
 	// general input
-	inputManager.RegisterKeyboardCmd(SDLK_F1, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { LoadNextLevel(m_NextLevelID); }));
+	inputManager.RegisterKeyboardCmd(SDLK_F1, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { kob::ServiceLocator::GetSoundService().StopAll(); LoadNextLevel(m_NextLevelID); }));
 	inputManager.RegisterKeyboardCmd(SDLK_F2, kob::TriggerState::Pressed, std::make_unique<ToggleMuteSoundCommand>());
-
 }
-void bt::GamePlayingState::SetupUI()
+void bt::GamePlayingState::SetupUI() const
 {
 	auto pepperFont = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 14);
 	auto& scene = GetGameManager()->GetGameObject()->GetScene();
@@ -262,11 +273,8 @@ void bt::GamePlayingState::SetupUI()
 	int pIdx = 0;
 	for (const auto& p : m_vPlayers)
 	{
-		const auto pepper = p->GetComponent<ThrowPepperComponent>();
-		const auto hp = p->GetComponent<HealthComponent>();
-
 		// Health
-		if (hp)
+		if (const auto hp = p->GetComponent<HealthComponent>())
 		{
 			auto& healthUI = scene.AddEmpty("HealthUI");
 			healthUI.SetParent(m_pLevelObject);
@@ -277,7 +285,7 @@ void bt::GamePlayingState::SetupUI()
 		}
 
 		// pepper
-		if (pepper)
+		if (const auto pepper = p->GetComponent<ThrowPepperComponent>())
 		{
 			auto& pepperUICount = scene.AddEmpty("PepperUICount");
 			pepperUICount.SetParent(m_pLevelObject);
@@ -292,9 +300,26 @@ void bt::GamePlayingState::SetupUI()
 }
 void bt::GamePlayingState::OnIngredientCompleted()
 {
-	++m_CompletedIngredientCount;
+	++m_IngredientCount;
 	if (m_IngredientCount == m_CompletedIngredientCount)
-		LoadNextLevel(m_NextLevelID);
+	{
+		kob::ServiceLocator::GetSoundService().StopAll();
+		kob::ServiceLocator::GetSoundService().Play("sound/Round Clear.wav", 1.f);
+		for (const auto& p : m_vPlayers)
+		{
+			if (const auto comp = p->GetComponent<MovementComponent>())
+				comp->Immobilize();
+			if (const auto anim = p->GetComponent<kob::Animator>())
+				anim->Play("Celebrate", true);
+		}
+		auto enemies = m_pLevelObject->GetScene().GetObjectsByTag("Enemy");
+		for (const auto& e : enemies)
+		{
+			const auto comp = e->GetComponent<MovementComponent>();
+			comp->Immobilize();
+		}
+		m_LevelClearedDelay = 4.f;
+	}
 }
 void bt::GamePlayingState::EndGame()
 {

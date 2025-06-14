@@ -466,6 +466,7 @@ kob::GameObject* bt::LevelComponent::SpawnChef(const std::string& name, const st
 {
 	constexpr float chefWalkDelay = 0.1f;
 	constexpr float chefDeathDelay = 0.2f;
+	constexpr float chefCelebrateDelay = 0.3f;
 	constexpr int chefTxtSize = 16;
 	constexpr float speed = 50.f;
 	auto chefSheet = kob::ResourceManager::GetInstance().LoadSpriteSheet(sheetPath,
@@ -506,7 +507,12 @@ kob::GameObject* bt::LevelComponent::SpawnChef(const std::string& name, const st
 			            {96, 32, chefTxtSize, chefTxtSize},
 			            {112, 32, chefTxtSize, chefTxtSize},
 			            {128, 32, chefTxtSize, chefTxtSize},
-			        }, chefDeathDelay} }
+			        }, chefDeathDelay} },
+		        {"Celebrate", {
+			        {
+			            {16, 16, chefTxtSize, chefTxtSize},
+			            {48, 32, chefTxtSize, chefTxtSize},
+			        }, chefCelebrateDelay} }
 	        });
 
 	// spawn go
