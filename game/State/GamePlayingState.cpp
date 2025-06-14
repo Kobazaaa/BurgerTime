@@ -1,10 +1,10 @@
 #include "GamePlayingState.h"
 
 #include "Animator.h"
-#include "DamageCommand.h"
 #include "GameManagerComponent.h"
 #include "GridRendererComponent.h"
 #include "HealthComponent.h"
+#include "ScoreComponent.h"
 #include "IntUIComponent.h"
 #include "Kobengine.h"
 #include "LevelComponent.h"
@@ -17,8 +17,8 @@
 #include "InputManager.h"
 #include "PlayingCommands.h"
 #include "RespawnComponent.h"
-#include "ScoreCommand.h"
 #include "ServiceLocator.h"
+#include "SquashableComponent.h"
 #include "Timer.h"
 
 //--------------------------------------------------
@@ -116,6 +116,8 @@ void bt::GamePlayingState::ResetCurrentLevel()
 		comp->ImmediateRespawn();
 	}
 
+	// music
+	kob::ServiceLocator::GetSoundService().Play("sound/BGM.wav", 1.f, -1);
 }
 void bt::GamePlayingState::LoadNextLevel(int id)
 {
@@ -146,6 +148,7 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 #endif
 
 	// Hook Up Ingredients
+	auto scoreComp = GetGameManager()->GetGameObject()->GetComponent<ScoreComponent>();
 	const auto ingredients = m_pLevelObject->GetScene().GetObjectsByTag("Ingredient");
 	m_CompletedIngredientCount = 0;
 	m_IngredientCount = static_cast<int>(ingredients.size());
@@ -154,6 +157,7 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 		const auto ingredientComponent = ingredient->GetComponent<IngredientComponent>();
 		if (!ingredientComponent) continue;
 		ingredientComponent->OnPlateReached += &m_EventIngredientComplete;
+		ingredientComponent->OnScoreGained += std::bind(&ScoreComponent::AddScore, scoreComp, std::placeholders::_1);
 	}
 
 	// hook up players
@@ -178,6 +182,14 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 		}
 	}
 
+	// hook up score
+	const auto enemies = m_pLevelObject->GetScene().GetObjectsByTag("Enemy");
+	for (auto& e : enemies)
+	{
+		if (auto comp = e->GetComponent<SquashableComponent>())
+			comp->OnSquashedScored += std::bind(&ScoreComponent::AddScore, scoreComp, std::placeholders::_1);
+	}
+
 	// music
 	kob::ServiceLocator::GetSoundService().Play("sound/BGM.wav", 1.f, -1);
 }
@@ -189,7 +201,6 @@ void bt::GamePlayingState::SetupPlayers()
 	case GameMode::Solo:
 		{
 			m_vPlayers.push_back(levelComp->SpawnChef("MrPepper", "characters/ChefSheet.png"));
-			SetupUI();
 			break;
 		}
 	case GameMode::Versus:
@@ -197,17 +208,16 @@ void bt::GamePlayingState::SetupPlayers()
 			m_vPlayers.push_back(levelComp->SpawnChef("MrPepper", "characters/ChefSheet.png"));
 			m_vPlayers.push_back(levelComp->GetGameObject()->GetScene().GetObjectsByName("HotDog").front());
 			m_vPlayers.back()->RemoveComponent<EnemyAILogicComponent>();
-			SetupUI();
 			break;
 		}
 	case GameMode::CoOp:
 		{
 			m_vPlayers.push_back(levelComp->SpawnChef("MrPepper", "characters/ChefSheet.png"));
 			m_vPlayers.push_back(levelComp->SpawnChef("MrsPepper", "characters/MsChefSheet.png"));
-			SetupUI();
 			break;
 		}
 	}
+	SetupUI();
 
 	int idx{};
 	auto& inputManager = kob::InputManager::GetInstance();
@@ -258,9 +268,26 @@ void bt::GamePlayingState::SetupPlayers()
 }
 void bt::GamePlayingState::SetupUI() const
 {
-	auto pepperFont = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 14);
+	auto uiFont = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 14);
 	auto& scene = GetGameManager()->GetGameObject()->GetScene();
 	auto ws = kob::Kobengine::GetWindowSize();
+
+	// score
+	if (auto scoreComp = GetGameManager()->GetGameObject()->GetComponent<ScoreComponent>())
+	{
+		auto& scoreUI = scene.AddEmpty("ScoreUI");
+		scoreUI.SetParent(m_pLevelObject);
+		scoreUI.AddComponent<kob::TextRendererComponent>("1UP", uiFont);
+		scoreUI.SetLocalPosition({ 55, 10, 0 });
+		scoreUI.SetRenderPriority(-1);
+
+		auto& scoreUICount = scene.AddEmpty("ScoreUICount");
+		scoreUICount.SetParent(m_pLevelObject);
+		scoreUICount.AddComponent<kob::TextRendererComponent>("pepper", uiFont);
+		scoreUICount.AddComponent<kob::IntUIComponent>("", 0, "", scoreComp->OnScoreChanged);
+		scoreUICount.SetLocalPosition({ 65, 25, 0 });
+		scoreUICount.SetRenderPriority(-1);
+	}
 
 	// Pepper
 	auto& pepperUI = scene.AddEmpty("PepperUI");
@@ -289,12 +316,11 @@ void bt::GamePlayingState::SetupUI() const
 		{
 			auto& pepperUICount = scene.AddEmpty("PepperUICount");
 			pepperUICount.SetParent(m_pLevelObject);
-			pepperUICount.AddComponent<kob::TextRendererComponent>("pepper", pepperFont);
+			pepperUICount.AddComponent<kob::TextRendererComponent>("pepper", uiFont);
 			pepperUICount.AddComponent<kob::IntUIComponent>("", pepper->GetPepper(), "", pepper->OnPepperChange);
 			pepperUICount.SetLocalPosition({ ws.x - 45 * (pIdx + 1), 30, 0 });
 			pepperUICount.SetRenderPriority(-1);
 		}
-
 		++pIdx;
 	}
 }

@@ -26,8 +26,6 @@
 // COMMANDS
 #include "Animator.h"
 #include "PlayingCommands.h"
-#include "DamageCommand.h"
-#include "ScoreCommand.h"
 #include "SpriteSheet.h"
 
 
@@ -56,7 +54,9 @@ void kob::Kobengine::Setup()
 	auto& scene = SceneManager::GetInstance().CreateScene("GameScene");
 
 	auto& gameManager = scene.AddEmpty("GameManager");
+	gameManager.tag = "GameManager";
 	gameManager.FlagSceneIndependent();
 	gameManager.AddComponent<GameManagerComponent>();
+	gameManager.AddComponent<ScoreComponent>();
 }
 

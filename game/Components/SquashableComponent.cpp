@@ -11,8 +11,9 @@
 //--------------------------------------------------
 //    Constructor
 //--------------------------------------------------
-bt::SquashableComponent::SquashableComponent(kob::GameObject& parent)
+bt::SquashableComponent::SquashableComponent(kob::GameObject& parent, int scoreValue)
 	: Component(parent)
+	, m_ScoreValue(scoreValue)
 { }
 
 
@@ -27,6 +28,8 @@ void bt::SquashableComponent::Squash()
 	kob::ServiceLocator::GetSoundService().Play("sound/Enemy Squahed.wav", 1);
 	m_Squashed = true;
 	OnSquashed();
+	OnSquashedScored(m_ScoreValue);
+
 	if (auto anim = GetGameObject()->GetComponent<kob::Animator>())
 		anim->Play("Squashed", false);
 	if (auto move = GetGameObject()->GetComponent<MovementComponent>())

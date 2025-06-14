@@ -33,11 +33,10 @@ list(APPEND BURGER_TIME_SOURCES
     "${SOURCE_DIR}/Components/StunnableComponent.cpp"       "${SOURCE_DIR}/Components/StunnableComponent.h"
     "${SOURCE_DIR}/Components/ThrowPepperComponent.cpp"     "${SOURCE_DIR}/Components/ThrowPepperComponent.h"
     "${SOURCE_DIR}/Components/RespawnComponent.cpp"         "${SOURCE_DIR}/Components/RespawnComponent.h"
+    "${SOURCE_DIR}/Components/SelfDestroyComponent.cpp"     "${SOURCE_DIR}/Components/SelfDestroyComponent.h"
 
     # Commands
-    "${SOURCE_DIR}/InputCommands/DamageCommand.cpp"         "${SOURCE_DIR}/InputCommands/DamageCommand.h"
     "${SOURCE_DIR}/InputCommands/PlayingCommands.cpp"       "${SOURCE_DIR}/InputCommands/PlayingCommands.h"
-    "${SOURCE_DIR}/InputCommands/ScoreCommand.cpp"          "${SOURCE_DIR}/InputCommands/ScoreCommand.h"
 
     # Helpers
     "${SOURCE_DIR}/Helpers/LevelLoader.cpp"                 "${SOURCE_DIR}/Helpers/LevelLoader.h"

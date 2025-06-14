@@ -47,7 +47,11 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 		{
 			StopFalling(true);
 			if (!m_OnPlate)
+			{
 				OnPlateReached();
+				OnScoreGained(m_PerLevelScore);
+				OnScoreGained(GetBurgerDropScore());
+			}
 			m_OnPlate = true;
 		}
 		else if (otherIngredient->GetGameObject()->GetWorldTransform().GetPosition().y > GetGameObject()->GetWorldTransform().GetPosition().y)
@@ -61,6 +65,7 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 		if (!m_HitPlatformThisFrame)
 		{
 			StopFalling(true);
+			OnScoreGained(m_PerLevelScore);
 			if (m_ExtraLevelsToDrop > 0)
 			{
 				--m_ExtraLevelsToDrop;
@@ -68,6 +73,8 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 				StartFalling();
 				m_ExtraLevelsToDrop = temp;
 			}
+			else
+				OnScoreGained(GetBurgerDropScore());
 			m_HitPlatformThisFrame = true;
 		}
 	}
@@ -77,7 +84,11 @@ void bt::IngredientComponent::OnCollisionEnter(kob::GameObject& other)
 		{
 			StopFalling(true);
 			if (!m_OnPlate)
+			{
 				OnPlateReached();
+				OnScoreGained(m_PerLevelScore);
+				OnScoreGained(GetBurgerDropScore());
+			}
 			m_OnPlate = true;
 			m_HitPlatformThisFrame = true;
 		}
@@ -176,6 +187,7 @@ void bt::IngredientComponent::StartFalling()
 		kob::ServiceLocator::GetSoundService().Play("sound/Enemy Fall.wav", 1);
 		enemy->GetGameObject()->GetComponent<MovementComponent>()->Immobilize();
 		enemy->GetGameObject()->SetParent(GetGameObject(), true);
+		++m_CarryEnemyCount;
 	}
 
 	kob::ServiceLocator::GetSoundService().Play("sound/Burger Fall.wav", 1);
@@ -198,3 +210,9 @@ void bt::IngredientComponent::StopFalling(bool unParent)
 	}
 }
 bool bt::IngredientComponent::IsOnPlate() const { return m_OnPlate; }
+int bt::IngredientComponent::GetBurgerDropScore() const
+{
+	if (m_CarryEnemyCount <= 0)
+		return 0;
+	return 500 * (1 << (m_CarryEnemyCount - 1));
+}

@@ -94,7 +94,7 @@ namespace bt
 		kob::GameObject& AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const;
 		void AddPlatformTile(const std::string& texturePath, const glm::uvec2& xy, bool giveCollider) const;
 		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y);
-		kob::GameObject* SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const;
+		kob::GameObject* SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy, int value) const;
 
 		// Data 
 		uint32_t m_Rows{};

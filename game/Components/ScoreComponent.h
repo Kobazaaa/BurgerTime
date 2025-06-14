@@ -28,13 +28,11 @@ namespace bt
 		//--------------------------------------------------
 		//    Events
 		//--------------------------------------------------
-		kob::Event<int>& OnScoreChanged();
+		kob::Event<int> OnScoreChanged;
+		kob::Event<int> OnScoreAdded;
 
 	private:
 		// Datamembers
 		int m_Score{ 0 };
-
-		// Events
-		kob::Event<int> m_OnScoreChange;
 	};
 }

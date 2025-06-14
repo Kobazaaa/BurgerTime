@@ -1,5 +1,9 @@
 #include "ScoreComponent.h"
-#include <algorithm>
+#include "GameObject.h"
+#include "ResourceManager.h"
+#include "Scene.h"
+#include "TextRendererComponent.h"
+#include "SelfDestroyComponent.h"
 
 
 //--------------------------------------------------
@@ -27,14 +31,7 @@ int bt::ScoreComponent::GetScore() const
 void bt::ScoreComponent::AddScore(int amount)
 {
 	m_Score += amount;
-	m_OnScoreChange(m_Score);
-}
-
-
-//--------------------------------------------------
-//    Events
-//--------------------------------------------------
-kob::Event<int>& bt::ScoreComponent::OnScoreChanged()
-{
-	return m_OnScoreChange;
+	OnScoreChanged(m_Score);
+	if (amount > 0)
+		OnScoreAdded(amount);
 }

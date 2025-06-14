@@ -28,12 +28,14 @@ namespace bt
 		//    Event Callbacks
 		//--------------------------------------------------
 		kob::Event<> OnPlateReached{};
+		kob::Event<int> OnScoreGained{};
 
 		void OnChildSteppedOn(const IngredientTileComponent& child);
 		void DropChildren(uint32_t idx);
 		void StartFalling();
 		void StopFalling(bool unParent);
 		bool IsOnPlate() const;
+		int GetBurgerDropScore() const;
 
 	private:
 		// On Tile Interaction
@@ -53,6 +55,8 @@ namespace bt
 
 		// enemies
 		int m_ExtraLevelsToDrop{};
+		int m_CarryEnemyCount{};
+		int m_PerLevelScore{ 50 };
 		std::unordered_set<EnemyAILogicComponent*> m_vEnemiesOnTop{};
 	};
 }

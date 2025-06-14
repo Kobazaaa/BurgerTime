@@ -10,7 +10,7 @@ namespace bt
 		//--------------------------------------------------
 		//    Constructor
 		//--------------------------------------------------
-		explicit SquashableComponent(kob::GameObject& parent);
+		explicit SquashableComponent(kob::GameObject& parent, int scoreValue);
 
 		//--------------------------------------------------
 		//    Loop
@@ -24,9 +24,11 @@ namespace bt
 		//    Events
 		//--------------------------------------------------
 		kob::Event<> OnSquashed{};
+		kob::Event<int> OnSquashedScored{};
 		kob::EventCallback<> ResetCallback{ kob::EventCallback<>(this, &SquashableComponent::Reset )};
 
 	private:
 		bool m_Squashed = false;
+		int m_ScoreValue{};
 	};
 }

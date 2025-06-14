@@ -1,6 +1,5 @@
 #include "LevelComponent.h"
 #include "Animator.h"
-#include "DamageCommand.h"
 #include "HealthComponent.h"
 #include "ImageRendererComponent.h"
 #include "InputManager.h"
@@ -14,8 +13,6 @@
 #include "IngredientComponent.h"
 #include "ResourceManager.h"
 #include "RespawnComponent.h"
-#include "ScoreCommand.h"
-#include "ScoreComponent.h"
 #include "ServiceLocator.h"
 #include "SquashableComponent.h"
 #include "StunnableComponent.h"
@@ -131,17 +128,17 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 			}
 			case TileType::SpawnHotDog:
 			{
-				SpawnEnemy("HotDog", "characters/HotDogSheet.png", { x,y });
+				SpawnEnemy("HotDog", "characters/HotDogSheet.png", { x,y }, 100);
 				break;
 			}
 			case TileType::SpawnEgg:
 			{
-				SpawnEnemy("Egg", "characters/EggSheet.png", { x,y });
+				SpawnEnemy("Egg", "characters/EggSheet.png", { x,y }, 300);
 				break;
 			}
 			case TileType::SpawnPickle:
 			{
-				SpawnEnemy("Pickle", "characters/PickleSheet.png", { x,y });
+				SpawnEnemy("Pickle", "characters/PickleSheet.png", { x,y }, 200);
 				break;
 			}
 			default:
@@ -531,7 +528,6 @@ kob::GameObject* bt::LevelComponent::SpawnChef(const std::string& name, const st
 		kob::ServiceLocator::GetSoundService().Pause("sound/BGM.wav");
 		kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 1.f, 0);
 	};
-	chef.AddComponent<ScoreComponent>();
 	const auto renderComp = chef.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());
 	const auto animator = chef.AddComponent<kob::Animator>(renderComp, chefSheet);
 	const auto chefMovement = chef.AddComponent<MovementComponent>(speed);
@@ -552,7 +548,7 @@ kob::GameObject* bt::LevelComponent::SpawnChef(const std::string& name, const st
 
 	return &chef;
 }
-kob::GameObject* bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const
+kob::GameObject* bt::LevelComponent::SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy, int value) const
 {
 	constexpr float walkDelay = 0.1f;
 	constexpr float deathDelay = 0.1f;
@@ -606,7 +602,7 @@ kob::GameObject* bt::LevelComponent::SpawnEnemy(const std::string& name, const s
 
 	// add components
 	enemy.AddComponent<EnemyAILogicComponent>();
-	auto squashComponent = enemy.AddComponent<SquashableComponent>();
+	auto squashComponent = enemy.AddComponent<SquashableComponent>(value);
 	enemy.AddComponent<StunnableComponent>();
 	const auto renderComp = enemy.AddComponent<kob::ImageRendererComponent>(sheet->GetTexture());
 	const auto animator = enemy.AddComponent<kob::Animator>(renderComp, sheet);
