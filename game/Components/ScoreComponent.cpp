@@ -1,9 +1,5 @@
 #include "ScoreComponent.h"
 #include "GameObject.h"
-#include "ResourceManager.h"
-#include "Scene.h"
-#include "TextRendererComponent.h"
-#include "SelfDestroyComponent.h"
 
 
 //--------------------------------------------------

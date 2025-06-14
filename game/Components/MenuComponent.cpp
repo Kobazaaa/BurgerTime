@@ -25,6 +25,10 @@ void bt::MenuComponent::Update()
 //--------------------------------------------------
 //    Functionality
 //--------------------------------------------------
+bt::MenuOption& bt::MenuComponent::GetCurrentlySelectedOption()
+{
+	return m_vOptions[m_CurrentIndex];
+}
 void bt::MenuComponent::AddOption(const std::string& label, glm::vec2 pos, const std::function<void()>& onSelect)
 {
 	m_vOptions.emplace_back(label, pos, onSelect);

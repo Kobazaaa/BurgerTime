@@ -48,22 +48,26 @@ bt::IGameState* bt::GamePlayingState::Update()
 		if (m_LevelClearedDelay <= 0)
 			LoadNextLevel(m_NextLevelID);
 	}
-
-	if (m_EndGame)
-		return GetGameManager()->LeaderboardState();
+	if (m_EndGameDelay > 0)
+	{
+		m_EndGameDelay -= kob::Timer::GetDeltaSeconds();
+		if (m_EndGameDelay <= 0)
+			return GetGameManager()->LeaderboardState();
+	}
 	return nullptr;
 }
 
 void bt::GamePlayingState::OnEnter()
 {
-	m_EndGame = false;
+	m_EndGameDelay = -1;
+	m_LevelClearedDelay = -1;
+	m_LevelClearedDelay = -1;
 	LoadNextLevel(1);
 	SetupPlayers();
 }
 
 void bt::GamePlayingState::OnExit()
 {
-	m_EndGame = true;
 	m_pLevelObject->FlagForDeletion();
 	m_pLevelObject = nullptr;
 	for (auto& p : m_vPlayers)
@@ -127,7 +131,10 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 
 	// delete existing
 	if (m_pLevelObject)
+	{
+		
 		m_pLevelObject->FlagForDeletion();
+	}
 
 	// Level
 	m_NextLevelID = (id % m_MaxLevels) + 1;
@@ -161,24 +168,27 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 	}
 
 	// hook up players
-	const auto pLvl = m_pLevelObject->GetComponent<LevelComponent>();
-	if (GetGameManager()->gameMode == GameMode::Versus)
+	if (!m_vPlayers.empty())
 	{
-		m_vPlayers[0]->SetLocalPosition({ pLvl->GetChefSpawn() , 0.f });
-		m_vPlayers[1]->SetLocalPosition(pLvl->GetGameObject()->GetScene().GetObjectsByName("HotDog").front()->GetLocalTransform().GetPosition());
-	}
-	else
-	{
-		for (const auto& p : m_vPlayers)
-			p->SetLocalPosition({ pLvl->GetChefSpawn() , 0.f });
-	}
-	for (const auto& p : m_vPlayers)
-	{
-		p->SetParent(m_pLevelObject, true);
-		if (auto move = p->GetComponent<MovementComponent>())
+		const auto pLvl = m_pLevelObject->GetComponent<LevelComponent>();
+		if (GetGameManager()->gameMode == GameMode::Versus)
 		{
-			move->SetCurrentLevel(*pLvl);
-			move->Mobilize();
+			m_vPlayers[0]->SetLocalPosition({ pLvl->GetChefSpawn() , 0.f });
+			m_vPlayers[1]->SetLocalPosition(pLvl->GetGameObject()->GetScene().GetObjectsByName("HotDog").front()->GetLocalTransform().GetPosition());
+		}
+		else
+		{
+			for (const auto& p : m_vPlayers)
+				p->SetLocalPosition({ pLvl->GetChefSpawn() , 0.f });
+		}
+		for (const auto& p : m_vPlayers)
+		{
+			p->SetParent(m_pLevelObject, true);
+			if (auto move = p->GetComponent<MovementComponent>())
+			{
+				move->SetCurrentLevel(*pLvl);
+				move->Mobilize();
+			}
 		}
 	}
 
@@ -349,5 +359,5 @@ void bt::GamePlayingState::OnIngredientCompleted()
 }
 void bt::GamePlayingState::EndGame()
 {
-	m_EndGame = true;
+	m_EndGameDelay = 2.5f;
 }

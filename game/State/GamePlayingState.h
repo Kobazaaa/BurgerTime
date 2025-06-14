@@ -48,7 +48,6 @@ namespace bt
 		int m_MaxLevels{ 3 };
 		float m_PlayerDiedResetDelay{};
 		float m_LevelClearedDelay{};
-
-		bool m_EndGame{ false };
+		float m_EndGameDelay{};
 	};
 }

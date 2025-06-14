@@ -1,5 +1,7 @@
 #pragma once
 #include "IGameState.h"
+#include "MenuComponent.h"
+#include "TextRendererComponent.h"
 
 namespace kob
 {
@@ -23,9 +25,27 @@ namespace bt
 		void OnEnter() override;
 		void OnExit() override;
 
+		//--------------------------------------------------
+		//    State
+		//--------------------------------------------------
+		struct ScoreEntry
+		{
+			std::string name;
+			int score;
+		};
+		void SelectInput();
+		void SaveScore() const;
+		void LoadTopScores(size_t count);
+
 	private:
 		kob::GameObject* m_pLeaderboardObject{};
-		float m_Time{};
-		float m_Delay{7.f};
+		MenuComponent* m_pMenuComponent{};
+		ScoreEntry m_NewValue{};
+		kob::TextRendererComponent* m_pNameComp{};
+		std::string m_FileName{ "highscores.txt" };
+		std::vector<ScoreEntry> m_vLoadedHighScores{};
+
+		float m_ExistDelay{ 4.f };
+		float m_Timer{};
 	};
 }

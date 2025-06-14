@@ -31,6 +31,7 @@ namespace bt
 		//--------------------------------------------------
 		//    Functionality
 		//--------------------------------------------------
+		MenuOption& GetCurrentlySelectedOption();
 		void AddOption(const std::string& label, glm::vec2 pos, const std::function<void()>& onSelect);
 		void SetSelector(kob::GameObject* sel);
 		void MoveSelector(int dir);

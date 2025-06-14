@@ -1,8 +1,11 @@
 #include "GameLeaderboardState.h"
+#include <fstream>
 #include "GameManagerComponent.h"
 #include "ImageRendererComponent.h"
+#include "InputManager.h"
 #include "Kobengine.h"
 #include "ResourceManager.h"
+#include "ScoreComponent.h"
 #include "TextRendererComponent.h"
 #include "Timer.h"
 
@@ -18,31 +21,40 @@ bt::GameLeaderboardState::GameLeaderboardState(GameManagerComponent& gameManager
 	m_pLeaderboardObject = &scene.AddEmpty("StartMenu");
 	m_pLeaderboardObject->SetParent(GetGameManager()->GetGameObject());
 
-	//Background
-	auto& background = scene.AddEmpty("Background");
-	background.SetParent(m_pLeaderboardObject);
-	background.SetLocalPosition({ windowSize.x / 2, windowSize.y / 2, 0 });
-	const auto irc = background.AddComponent<kob::ImageRendererComponent>("background.tga");
-	const auto ircSize = irc->GetSize();
-	background.SetLocalScale({ static_cast<float>(windowSize.x) / ircSize.x, static_cast<float>(windowSize.y) / ircSize.y, 1 });
-
 	//Text
-	auto fontS = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 11);
 	auto fontL = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 16);
 
 	// Info
 	auto* info = &scene.AddEmpty();
 	info->SetParent(m_pLeaderboardObject);
-	info->AddComponent<kob::TextRendererComponent>("This is where the leaderboard will be!", fontS);
-	info->SetLocalPosition(glm::vec3(windowSize.x / 2, windowSize.y * 0.30f, 0));
-	info = &scene.AddEmpty();
-	info->SetParent(m_pLeaderboardObject);
-	info->AddComponent<kob::TextRendererComponent>("It's very empty now", fontS);
-	info->SetLocalPosition(glm::vec3(windowSize.x / 2, windowSize.y * 0.36f, 0));
-	info = &scene.AddEmpty();
-	info->SetParent(m_pLeaderboardObject);
-	info->AddComponent<kob::TextRendererComponent>("You will be transported shortly.", fontL);
-	info->SetLocalPosition(glm::vec3(windowSize.x / 2, windowSize.y * 0.72f, 0));
+	auto menu = info->AddComponent<MenuComponent>(*fontL);
+	m_pMenuComponent = menu;
+
+	std::vector<std::string> labels = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+										"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+										"U", "V", "W", "X", "Y", "Z"};
+
+	const float startX = 50.f;
+	const float startY = 50.f;
+	const float stepY = 75.f;
+	const float stepX = 50.f;
+	for (size_t i = 0; i < labels.size(); ++i)
+	{
+		size_t col = i % 10;
+		size_t row = i / 10;
+
+		float posX = startX + col * stepX;
+		float posY = startY + row * stepY;
+
+		menu->AddOption(labels[i], { posX, posY }, [&] { SelectInput(); });
+	}
+	menu->SetSelectorOffset({ 0, -25 });
+
+	auto& selector = scene.AddEmpty("MenuSelector");
+	selector.SetParent(m_pLeaderboardObject);
+	selector.AddComponent<kob::ImageRendererComponent>("characters/ChefSheet.png", glm::vec4{ 16, 16, 16, 16 });
+	selector.SetLocalScale({ 2, 2, 2 });
+	menu->SetSelector(&selector);
 
 	m_pLeaderboardObject->SetActive(false);
 }
@@ -53,20 +65,159 @@ bt::GameLeaderboardState::GameLeaderboardState(GameManagerComponent& gameManager
 //--------------------------------------------------
 bt::IGameState* bt::GameLeaderboardState::Update()
 {
-	m_Time += kob::Timer::GetDeltaSeconds();
-	if (m_Time >= m_Delay)
-		return GetGameManager()->MenuState();
+	if (m_Timer > 0)
+	{
+		m_Timer -= kob::Timer::GetDeltaSeconds();
+		if (m_Timer <= 0.f)
+			return GetGameManager()->MenuState();
+	}
 	return nullptr;
 }
 
 void bt::GameLeaderboardState::OnEnter()
 {
-	m_Time = 0.f;
+	m_Timer = -1;
 	m_pLeaderboardObject->SetActive(true);
+
+	auto& im = kob::InputManager::GetInstance();
+	im.RegisterGamepad();
+
+	// menu navigation
+	im.RegisterKeyboardCmd(SDLK_UP, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->MoveSelector(-10); }));
+	im.RegisterKeyboardCmd(SDLK_RIGHT, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->MoveSelector(1); }));
+	im.RegisterKeyboardCmd(SDLK_DOWN, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->MoveSelector(10);  }));
+	im.RegisterKeyboardCmd(SDLK_LEFT, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->MoveSelector(-1);  }));
+	im.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_UP, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->MoveSelector(-10); }), 0);
+	im.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_RIGHT, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->MoveSelector(1); }), 0);
+	im.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_DOWN, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->MoveSelector(10);  }), 0);
+	im.RegisterGamepadCmd(kob::Gamepad::Button::DPAD_LEFT, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->MoveSelector(-1);  }), 0);
+
+	// Select
+	im.RegisterGamepadCmd(
+		kob::Gamepad::Button::A,
+		kob::TriggerState::Pressed,
+		std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->SelectOption(); }), 0);
+	im.RegisterKeyboardCmd(
+		SDLK_SPACE,
+		kob::TriggerState::Pressed,
+		std::make_unique<kob::CommandPFN>([&] { m_pMenuComponent->SelectOption(); }));
+
+	auto fontS = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 12);
+	auto fontL = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 16);
+	auto& scene = GetGameManager()->GetGameObject()->GetScene();
+	auto& names = scene.AddEmpty("Names");
+	names.SetParent(m_pLeaderboardObject);
+	names.AddComponent<kob::TextRendererComponent>("NAME", fontL);
+	names.SetLocalPosition({ 50, 250, 0 });
+
+	auto& scores = scene.AddEmpty("Scores");
+	scores.SetParent(m_pLeaderboardObject);
+	scores.AddComponent<kob::TextRendererComponent>("SCORE", fontL);
+	scores.SetLocalPosition({ 250, 250, 0 });
+
+	LoadTopScores(5);
+	int idx = 0;
+	for (auto& r : m_vLoadedHighScores)
+	{
+		float yOffset = 250.f + (idx + 1) * 25.f;
+
+		auto& name = scene.AddEmpty(r.name);
+		name.SetParent(m_pLeaderboardObject);
+		name.AddComponent<kob::TextRendererComponent>(r.name, fontS);
+		name.SetLocalPosition({ 50, yOffset, 0});
+
+		auto& score = scene.AddEmpty(std::to_string(r.score));
+		score.SetParent(m_pLeaderboardObject);
+		score.AddComponent<kob::TextRendererComponent>(std::to_string(r.score), fontS);
+		score.SetLocalPosition({ 250, yOffset, 0 });
+
+		++idx;
+	}
+
+	m_NewValue.score = GetGameManager()->GetGameObject()->GetComponent<ScoreComponent>()->GetScore();
+	auto& name = scene.AddEmpty(m_NewValue.name);
+	name.SetParent(m_pLeaderboardObject);
+	m_pNameComp = name.AddComponent<kob::TextRendererComponent>("XXX", fontS);
+	name.SetLocalPosition({ 50, 400, 0 });
+
+	auto& score = scene.AddEmpty(std::to_string(m_NewValue.score));
+	score.SetParent(m_pLeaderboardObject);
+	score.AddComponent<kob::TextRendererComponent>(std::to_string(m_NewValue.score), fontS);
+	score.SetLocalPosition({ 250, 400, 0 });
+
+
 }
 
 void bt::GameLeaderboardState::OnExit()
 {
-	m_Time = 0.f;
 	m_pLeaderboardObject->SetActive(false);
+	m_pNameComp = nullptr;
+	m_NewValue = {};
+	kob::InputManager::GetInstance().UnregisterAll();
+}
+
+
+//--------------------------------------------------
+//    State
+//--------------------------------------------------
+void bt::GameLeaderboardState::SelectInput()
+{
+	if (m_Timer > 0)
+		return;
+	m_NewValue.name += m_pMenuComponent->GetCurrentlySelectedOption().label;
+	m_pNameComp->SetText(m_NewValue.name);
+	if (m_NewValue.name.size() >= 3)
+	{
+		SaveScore();
+		m_Timer = m_ExistDelay;
+	}
+}
+void bt::GameLeaderboardState::SaveScore() const
+{
+	std::vector<ScoreEntry> scores;
+	std::ifstream inFile(m_FileName);
+	std::string line;
+	while (std::getline(inFile, line))
+	{
+		std::istringstream iss(line);
+		ScoreEntry entry;
+		iss >> entry.name >> entry.score;
+		if (!entry.name.empty())
+			scores.push_back(entry);
+	}
+	inFile.close();
+	scores.push_back(m_NewValue);
+
+	std::ranges::sort(scores, [](const ScoreEntry& a, const ScoreEntry& b) {
+		return a.score > b.score;
+		});
+
+	std::ofstream outFile(m_FileName, std::ios::trunc);
+	for (const auto& entry : scores)
+		outFile << entry.name << " " << entry.score << "\n";
+
+	outFile.close();
+}
+
+void bt::GameLeaderboardState::LoadTopScores(size_t count)
+{
+	m_vLoadedHighScores.clear();
+	std::ifstream inFile(m_FileName);
+	std::string line;
+
+	while (std::getline(inFile, line))
+	{
+		std::istringstream iss(line);
+		ScoreEntry entry;
+		iss >> entry.name >> entry.score;
+		if (!entry.name.empty())
+			m_vLoadedHighScores.push_back(entry);
+	}
+
+	std::ranges::sort(m_vLoadedHighScores, [](const ScoreEntry& a, const ScoreEntry& b) {
+		return a.score > b.score;
+		});
+
+	if (m_vLoadedHighScores.size() > count)
+		m_vLoadedHighScores.resize(count);
 }

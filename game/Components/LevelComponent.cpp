@@ -525,7 +525,7 @@ kob::GameObject* bt::LevelComponent::SpawnChef(const std::string& name, const st
 	const auto chefHealth = chef.AddComponent<HealthComponent>(4);
 	chefHealth->OnDamageTaken() += []
 	{
-		kob::ServiceLocator::GetSoundService().Pause("sound/BGM.wav");
+		kob::ServiceLocator::GetSoundService().StopAll();
 		kob::ServiceLocator::GetSoundService().Play("sound/Death.wav", 1.f, 0);
 	};
 	const auto renderComp = chef.AddComponent<kob::ImageRendererComponent>(chefSheet->GetTexture());

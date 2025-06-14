@@ -35,12 +35,8 @@ bt::GameMenuState::GameMenuState(GameManagerComponent& gameManagerComp)
 	auto fontS = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 13);
 	auto fontL = kob::ResourceManager::GetInstance().LoadFont("fonts/arcade-legacy.otf", 16);
 
-	// Bean
-	auto* info = &scene.AddEmpty();
-	info->SetParent(m_pMenuObject);
-
 	// Modes
-	info = &scene.AddEmpty();
+	auto* info = &scene.AddEmpty();
 	info->SetParent(m_pMenuObject);
 	auto menu = info->AddComponent<MenuComponent>(*fontS);
 	m_pMenuComponent = menu;
