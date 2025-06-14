@@ -50,7 +50,7 @@ bt::IGameState* bt::GamePlayingState::Update()
 void bt::GamePlayingState::OnEnter()
 {
 	m_EndGame = false;
-	LoadNextLevel(2);
+	LoadNextLevel(1);
 	SetupPlayers();
 }
 
@@ -112,11 +112,16 @@ void bt::GamePlayingState::ResetCurrentLevel()
 }
 void bt::GamePlayingState::LoadNextLevel(int id)
 {
+	// un parent players to prevent deletion
+	for (const auto& p : m_vPlayers)
+		p->SetParent(nullptr, true);
+
+	// delete existing
 	if (m_pLevelObject)
 		m_pLevelObject->FlagForDeletion();
 
 	// Level
-	m_NextLevelID = id + 1;
+	m_NextLevelID = (id % m_MaxLevels) + 1;
 	auto& scene = GetGameManager()->GetGameObject()->GetScene();
 	m_pLevelObject = &scene.AddEmpty("Level" + std::to_string(id));
 	m_pLevelObject->SetParent(GetGameManager()->GetGameObject());
@@ -143,6 +148,25 @@ void bt::GamePlayingState::LoadNextLevel(int id)
 		if (!ingredientComponent) continue;
 		ingredientComponent->OnPlateReached += &m_EventIngredientComplete;
 	}
+
+	// hook up players
+	const auto pLvl = m_pLevelObject->GetComponent<LevelComponent>();
+	if (GetGameManager()->gameMode == GameMode::Versus)
+	{
+		m_vPlayers[0]->SetLocalPosition({ pLvl->GetChefSpawn() , 0.f });
+		m_vPlayers[1]->SetLocalPosition(pLvl->GetGameObject()->GetScene().GetObjectsByName("HotDog").front()->GetLocalTransform().GetPosition());
+	}
+	else
+	{
+		for (const auto& p : m_vPlayers)
+			p->SetLocalPosition({ pLvl->GetChefSpawn() , 0.f });
+	}
+	for (const auto& p : m_vPlayers)
+	{
+		p->SetParent(m_pLevelObject, true);
+		if (auto move = p->GetComponent<MovementComponent>())
+			move->SetCurrentLevel(*pLvl);
+	}
 }
 void bt::GamePlayingState::SetupPlayers()
 {
@@ -160,6 +184,7 @@ void bt::GamePlayingState::SetupPlayers()
 			m_vPlayers.push_back(levelComp->SpawnChef("MrPepper", "characters/ChefSheet.png"));
 			m_vPlayers.push_back(levelComp->GetGameObject()->GetScene().GetObjectsByName("HotDog").front());
 			m_vPlayers.back()->RemoveComponent<EnemyAILogicComponent>();
+			SetupUI();
 			break;
 		}
 	case GameMode::CoOp:
@@ -172,6 +197,7 @@ void bt::GamePlayingState::SetupPlayers()
 	}
 
 	int idx{};
+	auto& inputManager = kob::InputManager::GetInstance();
 	for (const auto& player : m_vPlayers)
 	{
 		if (const auto hp = player->GetComponent<HealthComponent>())
@@ -180,7 +206,6 @@ void bt::GamePlayingState::SetupPlayers()
 			hp->OnDamageTaken() += &m_EventPlayerDied;
 		}
 
-		auto& inputManager = kob::InputManager::GetInstance();
 		const auto movement = player->GetComponent<MovementComponent>();
 		const auto pepper = player->GetComponent<ThrowPepperComponent>();
 		if (idx == 0)
@@ -213,6 +238,10 @@ void bt::GamePlayingState::SetupPlayers()
 		}
 		++idx;
 	}
+
+	// general input
+	inputManager.RegisterKeyboardCmd(SDLK_F1, kob::TriggerState::Pressed, std::make_unique<kob::CommandPFN>([&] {LoadNextLevel(m_NextLevelID); }));
+
 }
 void bt::GamePlayingState::SetupUI()
 {
@@ -263,30 +292,7 @@ void bt::GamePlayingState::OnIngredientCompleted()
 {
 	++m_CompletedIngredientCount;
 	if (m_IngredientCount == m_CompletedIngredientCount)
-	{
-		for (const auto& p : m_vPlayers)
-			p->SetParent(nullptr, true);
-
 		LoadNextLevel(m_NextLevelID);
-		auto pLvl = m_pLevelObject->GetComponent<LevelComponent>();
-		if (GetGameManager()->gameMode == GameMode::Versus)
-		{
-			m_vPlayers[0]->SetLocalPosition({pLvl->GetChefSpawn() , 0.f});
-			m_vPlayers[1]->SetLocalPosition(pLvl->GetGameObject()->GetScene().GetObjectsByName("HotDog").front()->GetLocalTransform().GetPosition());
-		}
-		else
-		{
-			for (const auto& p : m_vPlayers)
-				p->SetLocalPosition({ pLvl->GetChefSpawn() , 0.f });
-		}
-
-		for (const auto& p : m_vPlayers)
-		{
-			p->SetParent(m_pLevelObject, true);
-			if (auto move = p->GetComponent<MovementComponent>())
-				move->SetCurrentLevel(*pLvl);
-		}
-	}
 }
 void bt::GamePlayingState::EndGame()
 {

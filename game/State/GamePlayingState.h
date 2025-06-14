@@ -45,6 +45,7 @@ namespace bt
 		int m_CompletedIngredientCount{};
 		int m_IngredientCount{};
 		int m_NextLevelID{};
+		int m_MaxLevels{ 3 };
 		float m_ResetDelay{};
 
 		bool m_EndGame{ false };
