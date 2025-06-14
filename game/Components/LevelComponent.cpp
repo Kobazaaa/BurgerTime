@@ -147,9 +147,15 @@ void bt::LevelComponent::SpawnTileMap(float tileSize)
 			default:
 			{
 				if (IsLadderAbove(x, y))
+				{
+					m_vTiles[y * m_Cols + x] = TileType::LadderPlatform;
 					AddPlatformTile(GetLadderPlatformPath(x), { x,y }, true);
+				}
 				else
+				{
+					m_vTiles[y * m_Cols + x] = TileType::Platform;
 					AddPlatformTile(GetPlatformPath(x), { x,y }, true);
+				}
 				break;
 			}
 			}
@@ -214,30 +220,63 @@ bool bt::LevelComponent::IsAlignedHorizontally(const glm::vec2& pos, float thres
 	const auto p = IdxToCenterPos(i);
 	return abs(p.x - pos.x) < threshold;
 }
-
-bool bt::LevelComponent::CanMoveTo(uint32_t col, uint32_t row, bool isEnemy) const
+bool bt::LevelComponent::IsLadder(uint32_t col, uint32_t row, bool isEnemy) const
 {
 	if (col >= m_Cols || row >= m_Rows)
 		return false;
-
 	const auto tile = m_vTiles[col + row * m_Cols];
-	const bool playerAllowed = tile == TileType::Ladder
-		|| tile == TileType::LadderPlatform
-
+	const bool playerAllowed =
+		tile == TileType::Ladder
+		|| tile == TileType::LadderPlatform;
+	const bool enemyAllowed = playerAllowed || tile == TileType::HiddenLadder;
+	return isEnemy ? enemyAllowed : playerAllowed;
+}
+bool bt::LevelComponent::CanMoveSide(uint32_t col, uint32_t row, bool isEnemy) const
+{
+	if (col >= m_Cols || row >= m_Rows)
+		return false;
+	const auto tile = m_vTiles[col + row * m_Cols];
+	const bool playerAllowed =
+		tile == TileType::LadderPlatform
 		|| tile == TileType::Platform
-
 		|| tile == TileType::TopBun
 		|| tile == TileType::Tomato
 		|| tile == TileType::Lettuce
 		|| tile == TileType::Cheese
 		|| tile == TileType::Burger
 		|| tile == TileType::BottomBun
+		|| tile == TileType::SpawnChef;
+	const bool enemyAllowed = playerAllowed ||
+		tile == TileType::Plate;
+	return isEnemy ? enemyAllowed : playerAllowed;
 
+}
+bool bt::LevelComponent::CanMoveDown(uint32_t col, uint32_t row, bool isEnemy) const
+{
+	if (col >= m_Cols || row >= m_Rows)
+		return false;
+
+	const auto tile = m_vTiles[col + row * m_Cols];
+	const bool playerAllowed =
+		tile == TileType::Ladder
+		|| tile == TileType::LadderPlatform
+		|| tile == TileType::SpawnChef;
+	const bool enemyAllowed = playerAllowed;
+	return isEnemy ? enemyAllowed : playerAllowed;
+}
+bool bt::LevelComponent::CanMoveUp(uint32_t col, uint32_t row, bool isEnemy) const
+{
+	if (col >= m_Cols || row >= m_Rows)
+		return false;
+
+	const auto tile = m_vTiles[col + row * m_Cols];
+	const bool playerAllowed =
+		tile == TileType::Ladder
+		|| tile == TileType::LadderPlatform
 		|| tile == TileType::SpawnChef;
 	const bool enemyAllowed = playerAllowed ||
 		tile == TileType::HiddenLadder ||
 		tile == TileType::Plate;
-
 	return isEnemy ? enemyAllowed : playerAllowed;
 }
 
@@ -340,11 +379,11 @@ void bt::LevelComponent::AddPlatformTile(const std::string& texturePath, const g
 	{
 		go.tag = "Platform";
 		auto coll = go.AddComponent<kob::ColliderComponent>();
-		coll->SetHalfSize({ m_TileSize / 2, m_TileSize / 8, 1 });
+		coll->SetHalfSize({ m_TileSize / 2 - 4, m_TileSize / 8, 1 });
 		coll->offset = { 0, m_TileSize / 2 + m_TileSize / 8, 1 };
 	}
 }
-void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const
+void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y)
 {
 	uint32_t col = x;
 	auto tile = m_vTiles[y * m_Cols + col];
@@ -363,11 +402,6 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 	const float pieceOffset = m_TileSize / 4;
 	while (tile == type && col < m_Cols)
 	{
-		if (IsLadderAbove(col, y))
-			AddPlatformTile(GetLadderPlatformPath(col), { col,y }, true);
-		else
-			AddPlatformTile(GetPlatformPath(col), { col,y }, true);
-
 		std::string spritePath{};
 		for (int i{}; i < 2; ++i)
 		{
@@ -391,8 +425,31 @@ void bt::LevelComponent::AddIngredientTile(TileType type, const std::string& bas
 			obj.SetRenderPriority(49);
 			vChildren.push_back(&obj);
 		}
+
 		++col;
 		tile = m_vTiles[y * m_Cols + col];
+	}
+
+
+	// set ingredient tiles to normal platform tiles
+	col = x;
+	tile = m_vTiles[y * m_Cols + col];
+	while (tile == type && col < m_Cols)
+	{
+		uint32_t colCopy = col;
+		++col;
+		tile = m_vTiles[y * m_Cols + col];
+		if (IsLadderAbove(colCopy, y))
+		{
+			m_vTiles[y * m_Cols + colCopy] = TileType::LadderPlatform;
+			AddPlatformTile(GetLadderPlatformPath(colCopy), { colCopy,y }, true);
+		}
+		else
+		{
+			m_vTiles[y * m_Cols + colCopy] = TileType::Platform;
+			AddPlatformTile(GetPlatformPath(colCopy), { colCopy,y }, true);
+		}
+
 	}
 
 	glm::vec3 pos = glm::vec3(0);
@@ -561,7 +618,7 @@ kob::GameObject* bt::LevelComponent::SpawnEnemy(const std::string& name, const s
 
 	// Add collider
 	auto collider = enemy.AddComponent<kob::ColliderComponent>();
-	collider->SetHalfSize({ txtSize * 3.f / 4.f, txtSize, txtSize });
+	collider->SetHalfSize({ txtSize * 3.f / 4.f, txtSize - 4, txtSize });
 
 	// cover up
 	auto& cover = scene.AddEmpty("Cover");

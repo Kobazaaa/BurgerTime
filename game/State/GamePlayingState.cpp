@@ -50,7 +50,7 @@ bt::IGameState* bt::GamePlayingState::Update()
 void bt::GamePlayingState::OnEnter()
 {
 	m_EndGame = false;
-	LoadNextLevel(1);
+	LoadNextLevel(2);
 	SetupPlayers();
 }
 
@@ -59,6 +59,9 @@ void bt::GamePlayingState::OnExit()
 	m_EndGame = true;
 	m_pLevelObject->FlagForDeletion();
 	m_pLevelObject = nullptr;
+	for (auto& p : m_vPlayers)
+		p->FlagForDeletion();
+	m_vPlayers.clear();
 	kob::InputManager::GetInstance().UnregisterAll();
 }
 
@@ -260,7 +263,30 @@ void bt::GamePlayingState::OnIngredientCompleted()
 {
 	++m_CompletedIngredientCount;
 	if (m_IngredientCount == m_CompletedIngredientCount)
+	{
+		for (const auto& p : m_vPlayers)
+			p->SetParent(nullptr, true);
+
 		LoadNextLevel(m_NextLevelID);
+		auto pLvl = m_pLevelObject->GetComponent<LevelComponent>();
+		if (GetGameManager()->gameMode == GameMode::Versus)
+		{
+			m_vPlayers[0]->SetLocalPosition({pLvl->GetChefSpawn() , 0.f});
+			m_vPlayers[1]->SetLocalPosition(pLvl->GetGameObject()->GetScene().GetObjectsByName("HotDog").front()->GetLocalTransform().GetPosition());
+		}
+		else
+		{
+			for (const auto& p : m_vPlayers)
+				p->SetLocalPosition({ pLvl->GetChefSpawn() , 0.f });
+		}
+
+		for (const auto& p : m_vPlayers)
+		{
+			p->SetParent(m_pLevelObject, true);
+			if (auto move = p->GetComponent<MovementComponent>())
+				move->SetCurrentLevel(*pLvl);
+		}
+	}
 }
 void bt::GamePlayingState::EndGame()
 {

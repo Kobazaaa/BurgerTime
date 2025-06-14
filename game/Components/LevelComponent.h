@@ -63,7 +63,10 @@ namespace bt
 		bool IsIngredientTile(TileType tile) const;
 		bool IsAlignedVertically(const glm::vec2& pos, float threshold) const;
 		bool IsAlignedHorizontally(const glm::vec2& pos, float threshold) const;
-		bool CanMoveTo(uint32_t col, uint32_t row, bool isEnemy) const;
+		bool IsLadder(uint32_t col, uint32_t row, bool isEnemy) const;
+		bool CanMoveDown(uint32_t col, uint32_t row, bool isEnemy) const;
+		bool CanMoveUp(uint32_t col, uint32_t row, bool isEnemy) const;
+		bool CanMoveSide(uint32_t col, uint32_t row, bool isEnemy) const;
 
 		//--------------------------------------------------
 		//    Accessors & Mutators
@@ -90,8 +93,7 @@ namespace bt
 		//--------------------------------------------------
 		kob::GameObject& AddTileGameObject(const std::string& texturePath, const glm::uvec2& xy, const glm::vec2& offset) const;
 		void AddPlatformTile(const std::string& texturePath, const glm::uvec2& xy, bool giveCollider) const;
-		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y) const;
-
+		void AddIngredientTile(TileType type, const std::string& basePath, uint32_t x, uint32_t y);
 		kob::GameObject* SpawnEnemy(const std::string& name, const std::string& sheetPath, const glm::uvec2& xy) const;
 
 		// Data 

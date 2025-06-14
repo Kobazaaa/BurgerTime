@@ -101,8 +101,13 @@ bool bt::MovementComponent::CanMoveUp() const
 	const auto colRow = m_pCurrentLevel->PosToColRow(centerPos);
 	if (centerPos.y > m_pCurrentLevel->ColRowToCenterPos(colRow).y)
 		return true;
-	return m_pCurrentLevel->IsAlignedHorizontally(centerPos, m_AlignmentMargin)
-		&& m_pCurrentLevel->CanMoveTo(colRow.x, colRow.y - 1, m_IsEnemy);
+
+	const bool isHorizontallyAligned = m_pCurrentLevel->IsAlignedHorizontally(centerPos, m_AlignmentMargin);
+	const bool onLadder = m_pCurrentLevel->IsLadder(colRow.x, colRow.y, m_IsEnemy);
+	const bool isBetweenLadders = m_pCurrentLevel->IsLadder(colRow.x, colRow.y - 1, m_IsEnemy) &&
+		m_pCurrentLevel->IsLadder(colRow.x, colRow.y + 1, m_IsEnemy) &&
+		!m_pCurrentLevel->IsLadder(colRow.x, colRow.y, m_IsEnemy);
+	return isHorizontallyAligned && onLadder && !isBetweenLadders;
 }
 
 bool bt::MovementComponent::CanMoveDown() const
@@ -112,7 +117,7 @@ bool bt::MovementComponent::CanMoveDown() const
 	if (centerPos.y < m_pCurrentLevel->ColRowToCenterPos(colRow).y)
 		return true;
 	return m_pCurrentLevel->IsAlignedHorizontally(centerPos, m_AlignmentMargin)
-		&& m_pCurrentLevel->CanMoveTo(colRow.x, colRow.y + 1, m_IsEnemy);
+		&& m_pCurrentLevel->CanMoveDown(colRow.x, colRow.y + 1, m_IsEnemy);
 }
 
 bool bt::MovementComponent::CanMoveLeft() const
@@ -122,7 +127,7 @@ bool bt::MovementComponent::CanMoveLeft() const
 	if (centerPos.x > m_pCurrentLevel->ColRowToCenterPos(colRow).x)
 		return true;
 	return m_pCurrentLevel->IsAlignedVertically(centerPos, m_AlignmentMargin)
-		&& m_pCurrentLevel->CanMoveTo(colRow.x - 1, colRow.y, m_IsEnemy);
+		&& m_pCurrentLevel->CanMoveSide(colRow.x - 1, colRow.y, m_IsEnemy);
 }
 
 bool bt::MovementComponent::CanMoveRight() const
@@ -132,5 +137,5 @@ bool bt::MovementComponent::CanMoveRight() const
 	if (centerPos.x < m_pCurrentLevel->ColRowToCenterPos(colRow).x)
 		return true;
 	return m_pCurrentLevel->IsAlignedVertically(centerPos, m_AlignmentMargin)
-		&& m_pCurrentLevel->CanMoveTo(colRow.x + 1, colRow.y, m_IsEnemy);
+		&& m_pCurrentLevel->CanMoveSide(colRow.x + 1, colRow.y, m_IsEnemy);
 }
