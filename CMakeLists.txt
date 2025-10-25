@@ -5,7 +5,7 @@
 # Setup
 cmake_minimum_required(VERSION 3.26)
 project(BurgerTime)
-add_subdirectory(Kobengine)
+add_subdirectory(Kobengine-Proto)
 
 # Set variables
 set(TARGET_NAME BurgerTime)
@@ -75,4 +75,4 @@ if(WIN32)
 endif()
 
 # Link Kobengine
-target_link_libraries(${TARGET_NAME} PRIVATE kobengine)
+target_link_libraries(${TARGET_NAME} PRIVATE kobengine-proto)
